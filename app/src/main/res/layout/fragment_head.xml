@@ -8,7 +8,7 @@
     tools:context=".AuthorizationFragment">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/authorizationScreen"
+        android:id="@+id/newMeetScreen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
@@ -17,8 +17,8 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="0dp"
-            android:layout_height="46dp"
-            android:src="@color/colorPrimary"
+            android:layout_height="48dp"
+            android:src="@drawable/gradient"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -37,8 +37,8 @@
 
         <ImageButton
             android:id="@+id/button3"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginEnd="5dp"
             android:background="@android:drawable/list_selector_background"
             android:src="@drawable/ic_add"

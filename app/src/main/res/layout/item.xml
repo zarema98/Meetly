@@ -8,68 +8,73 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="135dp">
+        android:layout_height="140dp">
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+            android:id="@+id/imgMeet"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
+            android:background="@drawable/ic_image"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@color/colorPrimary" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/testText"
+            android:id="@+id/nameMeet"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
-
-            android:text="TextView"
+            android:layout_marginEnd="5dp"
+            android:text="Название встречи "
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/imgMeet"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/imageView"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/imgMeet"
+            app:layout_constraintTop_toTopOf="@+id/imgMeet"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/descriptionMeet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Описание встречи"
-            app:layout_constraintStart_toStartOf="@+id/testText"
-            app:layout_constraintTop_toBottomOf="@+id/testText" />
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/nameMeet"
+            app:layout_constraintTop_toBottomOf="@+id/nameMeet" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/dataMeet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00 01 января 2018"
             android:textColor="@android:color/holo_red_dark"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
-            app:layout_constraintEnd_toEndOf="@+id/testText" />
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imgMeet"
+            app:layout_constraintEnd_toEndOf="@+id/nameMeet" />
 
-        <TextView
-            android:id="@+id/button"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
+        <Button
             android:text="Подробнее"
-            android:textColor="@color/colorProjectTextWhite"
+            android:layout_marginTop="12dp"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_width="340dp"
+            android:layout_height="36dp"
+            android:background="@drawable/buttonshape"
+            android:shadowColor="#A8A09C"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="55"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/imgMeet" />
     </android.support.constraint.ConstraintLayout>
 
 

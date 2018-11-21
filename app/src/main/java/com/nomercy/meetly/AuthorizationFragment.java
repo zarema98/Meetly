@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,7 @@ public class AuthorizationFragment extends Fragment {
     Retrofit retrofit;
     ProgressBar authProgressBar, registerProgressBar, createAccountProgressBar;
     private DBHelper mDBHelper;
-
+    String formattedTelephone;
 
     String userStatus;
     public boolean numberStatus; // Переменная содержащая статус номера.
@@ -200,14 +201,17 @@ public class AuthorizationFragment extends Fragment {
     void checkNumberLogic() {
         APIInterface service = retrofit.create(APIInterface.class);
         telephone = numberInput.getText().toString();
+         formattedTelephone = telephone.replaceAll("\\s", "");
+
         if (telephone.length() < 16) {
-            Toast.makeText(getContext(), "Телефон введен не верно!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Телефон введен не верно! ", Toast.LENGTH_LONG).show();
+
         } else {
             authProgressBar.setVisibility(View.VISIBLE);
             authProgressBar.setProgress(20);
             authProgressBar.setMax(70);
 
-        Call<User> call = service.post(telephone);
+        Call<User> call = service.post(formattedTelephone);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -275,7 +279,7 @@ public class AuthorizationFragment extends Fragment {
         registerProgressBar.setProgress(20);
         registerProgressBar.setMax(70);
         if(numberStatus) {
-            final Call<User> call2 = service.postlogin(codeInput.getText().toString(), telephone);
+            final Call<User> call2 = service.postlogin(codeInput.getText().toString(), formattedTelephone);
             call2.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
@@ -303,7 +307,7 @@ public class AuthorizationFragment extends Fragment {
                 }
             });
         }else {
-            Call<User> call3 = service.post(codeInput.getText().toString(),telephone);
+            Call<User> call3 = service.post(codeInput.getText().toString(),formattedTelephone);
             call3.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {

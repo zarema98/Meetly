@@ -58,7 +58,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.VHolder> {
         public VHolder(final View itemView) {
             super(itemView);
 
-            testText = itemView.findViewById(R.id.testText);
+            testText = itemView.findViewById(R.id.nameMeet);
             // Setup the click listener
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

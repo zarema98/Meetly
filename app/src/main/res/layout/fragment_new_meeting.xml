@@ -127,15 +127,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Время встречи"
+            android:text="Дата"
             android:textColor="@color/colorProjectTextDark"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/timeInput"
+            app:layout_constraintStart_toStartOf="@+id/dateInput"
             app:layout_constraintTop_toBottomOf="@+id/descriptionInput" />
 
         <EditText
-            android:id="@+id/timeInput"
+            android:id="@+id/dateInput"
             android:layout_width="0dp"
+            android:editable="false"
             android:layout_height="wrap_content"
             android:layout_marginEnd="25dp"
             android:layout_marginStart="5dp"
@@ -152,16 +153,20 @@
             app:layout_constraintTop_toBottomOf="@+id/timeInfo" />
 
         <Button
-            android:id="@+id/btnTime"
+            android:id="@+id/btnDate"
             android:layout_width="0dp"
             android:layout_height="30dp"
-            android:background="@drawable/fields2"
-            android:text="Настроить время"
+            android:background="@drawable/buttonshape"
+            android:shadowColor="#A8A09C"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="55"
+            android:text="Выбрать дату"
             android:textAllCaps="false"
             android:textColor="@color/colorProjectTextWhite"
-            app:layout_constraintEnd_toEndOf="@+id/timeInput"
-            app:layout_constraintStart_toStartOf="@+id/timeInput"
-            app:layout_constraintTop_toBottomOf="@+id/timeInput" />
+            app:layout_constraintEnd_toEndOf="@+id/dateInput"
+            app:layout_constraintStart_toStartOf="@+id/dateInput"
+            app:layout_constraintTop_toBottomOf="@+id/dateInput" />
 
         <TextView
             android:id="@+id/placeInfo"
@@ -172,7 +177,7 @@
             android:textColor="@color/colorProjectTextDark"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@+id/placeInput"
-            app:layout_constraintTop_toBottomOf="@+id/btnTime" />
+            app:layout_constraintTop_toBottomOf="@+id/btnDate" />
 
         <EditText
             android:id="@+id/placeInput"
@@ -196,7 +201,11 @@
             android:id="@+id/btnPlace"
             android:layout_width="0dp"
             android:layout_height="30dp"
-            android:background="@drawable/fields2"
+            android:background="@drawable/buttonshape"
+            android:shadowColor="#A8A09C"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="55"
             android:text="Выбрать заведение"
             android:textAllCaps="false"
             android:textColor="@color/colorProjectTextWhite"
@@ -206,13 +215,17 @@
 
         <Button
             android:id="@+id/btn_createMeet"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:layout_width="0dp"
-            android:layout_height="34dp"
-            android:layout_marginBottom="12dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginEnd="25dp"
             android:layout_marginStart="25dp"
-            android:background="@drawable/fields2"
+            android:background="@drawable/buttonshape"
+            android:shadowColor="#A8A09C"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="55"
             android:text="Создать встречу"
             android:textAllCaps="false"
             android:textColor="@color/colorProjectTextWhite"
@@ -220,6 +233,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/createMeetProgressBar"
+            android:layout_marginTop="1dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:indeterminate="true"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_createMeet"/>
+
 
     </android.support.constraint.ConstraintLayout>
 

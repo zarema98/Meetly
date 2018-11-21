@@ -82,14 +82,7 @@ public class ContactsFragment extends Fragment {
         }
         //Метод получения контактных данных
         //getContacts()
-//        contactList.setOnItemClickListener(new
-//
-//                                                   AdapterView.OnItemClickListener() {
-//                                                       @Override
-//                                                       public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-//                                                           Toast.makeText(getContext(), "Приглашениеи в Meetly успешно отправлено. Получатель: " + contacts, Toast.LENGTH_LONG).show();
-//                                                       }
-//                                                   });
+
         button2 = v3.findViewById(R.id.button2);
         addListenerOnButton();
         return v3;
@@ -157,13 +150,9 @@ public class ContactsFragment extends Fragment {
                     Cursor phoneCursor =
                             contentResolver.query(PhoneCONTENT_URI, null,
                                     Phone_CONTACT_ID + " = ?", new String[]{contact_id}, null);
-                    boolean chec = true;
                     while (phoneCursor.moveToNext()) {
-                        phoneNumber =
-                                phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
-                        if (chec) {
+                        phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
                             tell.add(phoneNumber);
-                            chec = false;
                         }
                     }
                 }
@@ -172,7 +161,13 @@ public class ContactsFragment extends Fragment {
             //ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, tell);
             //Полученные данные отображаем с созданном элементе TextView:
             contactList.setAdapter(adapter);
+            contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                    Toast.makeText(getContext(), tell.get(pos), Toast.LENGTH_SHORT).show();
+                }
+            });
             //contactList.setAdapter(adapter2);
-        }
+
     }
 }
