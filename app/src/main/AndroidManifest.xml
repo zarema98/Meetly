@@ -22,6 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MembersActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".NewPlace"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".GroupsMain"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

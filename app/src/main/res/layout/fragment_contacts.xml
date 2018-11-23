@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btnExitFromFriends"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginStart="5dp"
@@ -38,7 +38,7 @@
             android:layout_marginStart="5dp"
             android:text="Список контактов"
             app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-            app:layout_constraintStart_toEndOf="@+id/button2"
+            app:layout_constraintStart_toEndOf="@+id/btnExitFromFriends"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ListView

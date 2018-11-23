@@ -1,5 +1,7 @@
 package com.nomercy.meetly.api;
 
+import com.nomercy.meetly.GroupList;
+import com.nomercy.meetly.Groups;
 import com.nomercy.meetly.MeetList;
 
 import retrofit2.Call;
@@ -49,16 +51,30 @@ public interface APIInterface {
             @Field("user_id") int user_id
 
     );
-    @FormUrlEncoded
-    @GET("/api/meets/sendPush")
-    Call<User>get(
-            @Field("token") String token
-    );
-
 
     @GET("/api/meets/getMeets/{id}")
     Call<MeetList>get(
             @Path("id") int id
     );
+
+    @GET("/api/auth/logout/{id}")
+    Call<User>logout(
+            @Path("id") int id
+    );
+
+    @FormUrlEncoded
+    @POST("/api/groups/createGroup")
+    Call<Groups>post(
+            @Field("name") String name,
+            @Field("user_id") int user_id
+    );
+
+    @GET("/api/groups/getGroups/{id}")
+    Call<GroupList>getGroup(
+            @Path("id") int id
+    );
+
+
+
 }
 

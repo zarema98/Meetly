@@ -5,7 +5,10 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class User implements Serializable {
+
+    @SerializedName("telephone")
     public String telephone;
+
     @SerializedName("auth")
     public boolean auth;
 
@@ -27,10 +30,25 @@ public class User implements Serializable {
     @SerializedName("user_id")
     private String user_id;
 
-    public User(int id, String token) {
-        this.id = id;
-        this.token = token;
+    public boolean isSelected;
+
+    public User(String telephone, String name) {
+        this.telephone = telephone;
+        this.name = name;
     }
+
+    public void setSelected (boolean selected) {
+        isSelected = selected;
+    }
+
+    public boolean isSelected () {
+        return isSelected;
+    }
+
+//    public User(int id, String token) {
+//        this.id = id;
+//        this.token = token;
+//    }
     public String getName() {
         return name;
     }

@@ -180,12 +180,15 @@ public class AuthorizationFragment extends Fragment {
             public void run() {
                 logoScreen.setVisibility(View.GONE);
                 if(mDBHelper.isEmpty()) {
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                     authorizationHeadScreen.setVisibility(View.VISIBLE);
                     authorizationScreen.setVisibility(View.VISIBLE);
                 } else if(mDBHelper.getAuth() == 0) {
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                     authorizationHeadScreen.setVisibility(View.VISIBLE);
                     authorizationScreen.setVisibility(View.VISIBLE);
                 } else if (mDBHelper.getAuth() == 1){
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
                     logoScreen.setVisibility(View.GONE);
                     authorizationHeadScreen.setVisibility(View.GONE);
                     authorizationScreen.setVisibility(View.GONE);

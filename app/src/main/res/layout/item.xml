@@ -1,81 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginTop="8dp"
+    android:layout_height="140dp">
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="140dp">
 
-        <ImageView
-            android:id="@+id/imgMeet"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/ic_image"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgMeet"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/meetly_background"
+        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_width="2dp" />
+
+
 
         <TextView
             android:id="@+id/nameMeet"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginLeft="19dp"
             android:text="Название встречи "
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imgMeet"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/imgMeet"
-            app:layout_constraintTop_toTopOf="@+id/imgMeet"
-            app:layout_constraintVertical_bias="0.0" />
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_alignTop="@+id/imgMeet"
+            android:layout_toRightOf="@+id/imgMeet"
+            />
 
         <TextView
             android:id="@+id/descriptionMeet"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="Описание встречи"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/nameMeet"
-            app:layout_constraintTop_toBottomOf="@+id/nameMeet" />
+            android:layout_below="@+id/nameMeet"
+            android:layout_alignLeft="@+id/nameMeet"
+            android:layout_alignStart="@+id/nameMeet" />
 
-        <TextView
-            android:id="@+id/dataMeet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00 01 января 2018"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/imgMeet"
-            app:layout_constraintEnd_toEndOf="@+id/nameMeet" />
+    <TextView
+        android:id="@+id/dataMeet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/descriptionMeet"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="5dp"
+        android:text="00:00 01 января 2018"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="14sp" />
 
-        <Button
-            android:text="Подробнее"
-            android:layout_marginTop="12dp"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:layout_width="340dp"
-            android:layout_height="36dp"
-            android:background="@drawable/buttonshape"
-            android:shadowColor="#A8A09C"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="55"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.49"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgMeet" />
-    </android.support.constraint.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/imgMeet"
+        android:layout_alignLeft="@+id/imgMeet"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginRight="8dp"
+        android:background="@color/colorPrimaryDark" />
 
 
-</LinearLayout>
+</RelativeLayout>

@@ -91,10 +91,10 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
-        public void deleteUser() {
+        public void deleteUser(int id) {
             try {
-                String q = "DELETE FROM users";
-                Cursor result = mDB.rawQuery(q, null);
+                String q = "DELETE FROM users WHERE upper([id]) = upper(?)";
+                mDB.execSQL(q, new Object[]{id});
             } catch (SQLException ex) {
 
             }

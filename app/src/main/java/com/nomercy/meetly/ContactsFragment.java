@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,7 +36,7 @@ public class ContactsFragment extends Fragment {
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
     ListView contactList;
-    Button button2;
+    Button btnExitFromFriends;
 
     public interface onSomeEventListener {
         void someEvent(String s);
@@ -66,6 +67,7 @@ public class ContactsFragment extends Fragment {
 
         //Связываемся с нашим элементом TextView:
         contactList = v3.findViewById(R.id.server);
+
         int hasReadContactPermission = ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.READ_CONTACTS);
         if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             READ_CONTACTS_GRANTED = true;
@@ -83,17 +85,19 @@ public class ContactsFragment extends Fragment {
         //Метод получения контактных данных
         //getContacts()
 
-        button2 = v3.findViewById(R.id.button2);
+        btnExitFromFriends = v3.findViewById(R.id.btnExitFromFriends);
         addListenerOnButton();
         return v3;
     }
 
     // Сканер косаний:
     public void addListenerOnButton() {
-        button2.setOnClickListener(
+        btnExitFromFriends.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Intent intent = new Intent(getContext(), MeetlyApp.class);
+                        startActivity(intent);
                         someEventListener.someEvent("backToMain"); // глвынй экран
                     }
                 }

@@ -3,7 +3,11 @@ package com.nomercy.meetly;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.nomercy.meetly.api.APIInterface;
@@ -36,19 +41,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewMeetingFragment extends Fragment  {
 
-    Button button5, createMeet, btnDate;
+    Button button5, createMeet, btnDate, btnTime, btnPlace, btnMembers;
     Retrofit retrofit;
-    EditText name, description, dateInput;
-    String nameS, descriptionS;
+    EditText name, description, dateInput, timeInput, placeInput, membersInput;
+    String nameS, descriptionS, date, time;
     ProgressBar createMeetProgressBar;
     DBHelper mDbHelper;
     int id;
+    int place_id = 1;
     String message;
-    Calendar c;
-    DatePickerDialog datePickerDialog;
-    private FragmentActivity myContext;
-
-
 
     public interface onSomeEventListener {
         void someEvent(String s);
@@ -80,12 +81,25 @@ public class NewMeetingFragment extends Fragment  {
         button5 = v2.findViewById(R.id.button5);
         btnDate = v2.findViewById(R.id.btnDate);
         createMeet = v2.findViewById(R.id.btn_createMeet);
+        btnTime = v2.findViewById(R.id.btnTime);
+        btnPlace = v2.findViewById(R.id.btnPlace);
+        btnMembers = v2.findViewById(R.id.btnMembers);
         name = v2.findViewById(R.id.nameInput);
         description = v2.findViewById(R.id.descriptionInput);
         dateInput = v2.findViewById(R.id.dateInput);
+        timeInput = v2.findViewById(R.id.timeInput);
+        placeInput = v2.findViewById(R.id.placeInput);
+        membersInput = v2.findViewById(R.id.membersInput);
         createMeetProgressBar = v2.findViewById(R.id.createMeetProgressBar);
         createMeetProgressBar.setVisibility(View.GONE);
         mDbHelper = new DBHelper(getContext());
+        dateInput.setTag(dateInput.getKeyListener());
+        dateInput.setKeyListener(null);
+        timeInput.setTag(timeInput.getKeyListener());
+        timeInput.setKeyListener(null);
+        membersInput.setTag(membersInput.getKeyListener());
+        membersInput.setKeyListener(null);
+
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -104,6 +118,25 @@ public class NewMeetingFragment extends Fragment  {
         return v2;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {return;}
+        if(requestCode ==1) {
+            String name = data.getStringExtra("name");
+            placeInput.setText(name);
+            place_id = data.getIntExtra("id", 1);
+            // Toast.makeText(getContext(), String.valueOf(place_id), Toast.LENGTH_LONG).show();
+        } else if(requestCode ==2) {
+            String names = data.getStringExtra("names");
+            String edit = membersInput.getText().toString();
+            if(edit.length() > 0) {
+                membersInput.getText().replace(edit.length()-1, edit.length(), ",");
+                membersInput.append(names);
+            } else membersInput.append(names);
+
+        }
+    }
+
     // Сканер косаний:
     public void addListenerOnButton() {
         button5.setOnClickListener(
@@ -118,9 +151,35 @@ public class NewMeetingFragment extends Fragment  {
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //chooseDate();
+                chooseDate();
             }
         });
+
+        btnTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseTime();
+            }
+        });
+
+        btnPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), NewPlace.class);
+                startActivityForResult(intent,1);
+            }
+        });
+
+        btnMembers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MembersActivity.class);
+                startActivityForResult(intent, 2);
+            }
+        });
+
+
+
 
         createMeet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,40 +191,76 @@ public class NewMeetingFragment extends Fragment  {
 
 
     public void chooseDate() {
-        c = Calendar.getInstance();
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int month = c.get(Calendar.MONTH);
-        int year = c.get(Calendar.YEAR);
+        DatePickerFragment date = new DatePickerFragment();
+        Calendar calender = Calendar.getInstance();
+        Bundle args = new Bundle();
+        args.putInt("year", calender.get(Calendar.YEAR));
+        args.putInt("month", calender.get(Calendar.MONTH));
+        args.putInt("day", calender.get(Calendar.DAY_OF_MONTH));
+        date.setArguments(args);
+        date.setCallBack(ondate);
+        date.show(getFragmentManager(), "Date Picker");
+    }
+    DatePickerDialog.OnDateSetListener ondate = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            dateInput.setText(String.valueOf(year) + "-" + String.valueOf(monthOfYear+1)
+                    + "-" + String.valueOf(dayOfMonth));
+        }
+    };
 
-//        datePickerDialog = new DatePickerDialog(getContext() , new DatePickerDialog.OnDateSetListener() {
-//            @Override
-//            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-//
-//            }
-//        });
+    public void chooseTime() {
+        TimePickerFragment time = new TimePickerFragment();
+        Calendar calender = Calendar.getInstance();
+        Bundle args = new Bundle();
+        args.putInt("hour", calender.get(Calendar.HOUR));
+        args.putInt("minute", calender.get(Calendar.MINUTE));
+        time.setArguments(args);
 
+        time.show(getFragmentManager(),"time picker");
+        TimePickerDialog.OnTimeSetListener ontime = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                timeInput.setText(String.valueOf(hour) + ":"+ String.valueOf(minute));
+            }
+        };
+        time.setCallBack(ontime);
     }
 
-   public void createMeet() {
+
+
+    public void createMeet() {
        APIInterface service = retrofit.create(APIInterface.class);
        nameS = name.getText().toString();
+       date = dateInput.getText().toString();
+       time = timeInput.getText().toString();
        descriptionS = description.getText().toString();
        id = mDbHelper.getId();
 
-       if (nameS.length() <= 0) {
-           Toast.makeText(getContext(), "Название встречи должно быть заполнено", Toast.LENGTH_LONG).show();
-       } else {
+       if (nameS.equals("")) {
+           name.setError("Название встречи должно быть заполнено");
+           //Toast.makeText(getContext(), "Название встречи должно быть заполнено", Toast.LENGTH_LONG).show();
+       } else if (date.equals("")) {
+           dateInput.setError("Дата должна быть заполнена");
+       }else if(time.equals("")) {
+           timeInput.setError("Время должно быть заполнено");
+       }else {
+           name.setError(null);
+           dateInput.setError(null);
+           timeInput.setError(null);
            createMeetProgressBar.setVisibility(View.VISIBLE);
            createMeetProgressBar.setProgress(20);
            createMeetProgressBar.setMax(70);
-       Call<User> call = service.post(nameS, "2018-12-12", "12:12", descriptionS, "photo", 1, new int[]{62, 63, 64}, id);
+
+       Call<User> call = service.post(nameS, date, time, descriptionS, "photo", place_id, new int[]{62, 63, 64}, id);
        call.enqueue(new Callback<User>() {
            @Override
            public void onResponse(Call<User> call, Response<User> response) {
                response.body();
-               message = response.body().getMessage();
-               Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
+             //  message = response.body().getMessage();
+           //    Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
                someEventListener.someEvent("backToMain");
+               Toast.makeText(getContext(), "Встреча успешно создана. Обновите страницу", Toast.LENGTH_LONG).show();
            }
 
            @Override

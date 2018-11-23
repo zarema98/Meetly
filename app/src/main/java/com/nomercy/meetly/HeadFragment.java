@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import android.widget.ImageButton;
 public class HeadFragment extends Fragment {
 
     ImageButton button3;
-
+    ImageButton btnMenu;
 
     public interface onSomeEventListener {
         public void someEvent(String s);
@@ -40,6 +41,13 @@ public class HeadFragment extends Fragment {
         View v1 =  inflater.inflate(R.layout.fragment_head, container, false);
 
         button3 = v1.findViewById(R.id.button3);
+        btnMenu = v1.findViewById(R.id.btnMenu);
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MeetlyApp.drawer.openDrawer(GravityCompat.START);
+            }
+        });
         addListenerOnButton();
         return v1;
     }

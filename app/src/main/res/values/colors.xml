@@ -2,8 +2,8 @@
 <resources>
 
     <!-- Application colors: -->
-    <color name="colorPrimary">#554a66</color>
-    <color name="colorPrimaryDark">#463c55</color>
+    <color name="colorPrimary">#5c316c</color>
+    <color name="colorPrimaryDark">#332845</color>
     <color name="colorProjectWhite">#afffffff</color>
     <color name="colorProjectTextWhite">#ffffff</color>
     <color name="colorProjectTextDark">#463c55</color>

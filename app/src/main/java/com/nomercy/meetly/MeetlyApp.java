@@ -1,27 +1,44 @@
 package com.nomercy.meetly;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Movie;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.design.widget.NavigationView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
 import com.nomercy.meetly.api.User;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,14 +51,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MeetlyApp extends AppCompatActivity implements AuthorizationFragment.onSomeEventListener {
+public class MeetlyApp extends AppCompatActivity implements AuthorizationFragment.onSomeEventListener,NavigationView.OnNavigationItemSelectedListener{
 
     // Инициализация переменных и объектов:
     FrameLayout frameHead, frameBody;
     RecyclerView feed;
-    ConstraintLayout meetsScreen;
-    Button btn_friends;
+    ConstraintLayout meetsScreen, newMeetBar;
+    int id;
+    Activity activity;
 
+    TextView txtEmpty;
     Adapter adapter;
     LinearLayoutManager manager;
     private SwipeRefreshLayout swipeContainer;
@@ -51,12 +70,17 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     private MeetAdapter mAdapter;
     Retrofit retrofit;
     DBHelper mDBHelper;
-    int id;
+    int auth;
 
+
+    public static DrawerLayout drawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meetly_app);
+        setContentView(R.layout.activity_main);
+     //   txtEmpty = findViewById(R.id.txtMeetIsEmpty);
+
+
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -75,12 +99,28 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
         frameHead = findViewById(R.id.frameHead);
         frameBody = findViewById(R.id.frameBody);
         meetsScreen = findViewById(R.id.meetsScreen);
-        btn_friends = findViewById(R.id.btn_friends);
+        newMeetBar = findViewById(R.id.newMeetScreen);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        getMeets();
         swipeContainer =  findViewById(R.id.swipeContainer);
+
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 getMeets();
+
 
             }
         });
@@ -93,7 +133,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
     public void getMeets() {
         APIInterface service = retrofit.create(APIInterface.class);
-        id = mDBHelper.getId();
+        int id = mDBHelper.getId();
             Call<MeetList> call = service.get(id);
             call.enqueue(new Callback<MeetList>() {
                 @Override
@@ -110,37 +150,24 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
     }
 
+
+
+
     public void generateMeets (ArrayList<Meet> meetDataList) {
         recyclerView = findViewById(R.id.feed);
         mAdapter = new MeetAdapter(meetDataList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
         swipeContainer.setRefreshing(false);
+
+
     }
 
     // Сканер косаний:
     public void addListenerOnButton() {
-        btn_friends.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                      //  registrationAccountScreen.setVisibility(View.GONE);
-                        meetsScreen.setVisibility(View.GONE);
-                        frameHead.setVisibility(View.GONE);
-                        frameBody.setVisibility(View.GONE);
-
-                        ContactsFragment contactsFragment = new ContactsFragment();
-                        FragmentManager fragmentManager1 = getSupportFragmentManager();
-                        fragmentManager1.beginTransaction()
-                                .replace(R.id.frameBody, contactsFragment)
-                                .commit();
-                        frameBody.setVisibility(View.VISIBLE);
-                    }
-                }
-        );
     }
 
 
@@ -152,6 +179,8 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
                 // Переход к главному экрану:
                 frameBody.setVisibility(View.GONE);
                 frameHead.setVisibility(View.VISIBLE);
+                meetsScreen.setVisibility(View.VISIBLE);
+
 
                 HeadFragment headFragment = new HeadFragment();
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -191,6 +220,113 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
                 .add(R.id.frameBody, authorizationFragment)
                 .commit();
     }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.btnMenu) {
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_settings) {
+//            String activeFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container).getClass().getSimpleName();
+//            if(!activeFragment.equals(BookmarkFragment.class.getSimpleName())) {
+//                goToFragment(bookmarkFragment, false);
+//            }
+        }
+
+        if (id == R.id.nav_group) {
+            Intent intent = new Intent(this, GroupsMain.class);
+            startActivity(intent);
+            // Handle the camera action
+        } else if (id == R.id.nav_money) {
+
+        } else if (id == R.id.nav_help) {
+
+        }  else if (id == R.id.nav_share) {
+            Intent myIntent = new Intent(Intent.ACTION_SEND);
+            myIntent.setType("text/plain");
+            String shareBody = "Зацени какое крутое приложение! Держи ссылку на скачивание: ...";
+            String shareSub = "Yout Subject here";
+            myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+            myIntent.putExtra(Intent.EXTRA_TEXT,shareBody);
+            startActivity(Intent.createChooser(myIntent,"Поделиться"));
+
+        } else if (id == R.id.nav_friends) {
+            meetsScreen.setVisibility(View.GONE);
+            frameHead.setVisibility(View.GONE);
+            frameBody.setVisibility(View.GONE);
+
+            ContactsFragment contactsFragment = new ContactsFragment();
+            FragmentManager fragmentManager1 = getSupportFragmentManager();
+            fragmentManager1.beginTransaction()
+                    .replace(R.id.frameBody, contactsFragment)
+                    .commit();
+            frameBody.setVisibility(View.VISIBLE);
+
+        }  else if (id == R.id.nav_exit) {
+            APIInterface service = retrofit.create(APIInterface.class);
+            final int user_id = mDBHelper.getId();
+
+            Call<User> call = service.logout(id);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    mDBHelper.deleteUser(user_id);
+                    finishAffinity();
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    // handle execution failures like no internet connectivity
+                }
+
+            });
+
+
+
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+
+
+
+
+
+
 
 
     // Переход к главному экрану:
