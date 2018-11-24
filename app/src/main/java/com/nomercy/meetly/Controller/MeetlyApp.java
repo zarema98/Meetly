@@ -482,6 +482,8 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
             startActivity(intent);
             // Handle the camera action
         } else if (id == R.id.nav_money) {
+            Intent intent = new Intent(this, ScoreActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_help) {
 

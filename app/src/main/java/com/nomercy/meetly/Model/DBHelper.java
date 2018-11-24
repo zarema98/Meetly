@@ -27,6 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String COL_ID = "id";
     private final String COL_TOKEN = "token";
     private final String COL_AUTH = "auth";
+    private final String COL_SEEN = "seen";
 
     public SQLiteDatabase mDB;
 
@@ -57,6 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
         File file  = new File(DATABASE_FULL_PATH);
         return file.exists();
     }
+
 
     public void extractAssetToDatabaseDirectory(String fileName) throws IOException{
         int length;
@@ -95,6 +97,15 @@ public class DBHelper extends SQLiteOpenHelper {
             try {
                 String q = "DELETE FROM users WHERE upper([id]) = upper(?)";
                 mDB.execSQL(q, new Object[]{id});
+            } catch (SQLException ex) {
+
+            }
+        }
+
+        public void updateSeen (int id) {
+            try {
+                String q = "UPDATE  users SET "+COL_SEEN+" = (?) WHERE id = "+id+" ";
+               mDB.execSQL(q, new String[]{String.valueOf(1)});
             } catch (SQLException ex) {
 
             }
@@ -140,7 +151,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void updateAuth () {
         try {
-            String q = "UPDATE  users SET upper([auth]) = uppper(?)";
+            String q = "UPDATE  users SET "+COL_AUTH+" = uppper(?)";
             Cursor result = mDB.rawQuery(q, new String[]{String.valueOf(1)});
         } catch (SQLException ex) {
 
