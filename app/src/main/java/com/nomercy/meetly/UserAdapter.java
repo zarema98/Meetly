@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,11 +17,12 @@ import com.nomercy.meetly.api.User;
 
 import java.util.ArrayList;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder>  {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> implements Filterable {
 
     private Context context;
     ArrayList<User> users = new ArrayList<>();
     ArrayList<User> checkedUsers = new ArrayList<>();
+    CustomFilter filter;
 
     public UserAdapter(ArrayList<User> users, Context context) {
         this.users = users;
@@ -71,6 +74,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         return users.size();
     }
 
+
+    public String getItemName (int position) {
+        return users.get(position).name;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView memberName;
         public CheckBox checkBox;
@@ -94,9 +102,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
     }
 
+    @Override
+    public Filter getFilter() {
+        if(filter==null)
+        {
+            filter=new CustomFilter(users,this);
+        }
 
-
-
+        return filter;
+    }
 
 
 

@@ -45,6 +45,18 @@ public class MeetAdapter extends RecyclerView.Adapter<MeetAdapter.MyViewHolder> 
         holder.dateMeet.setText(meet.getDate());
     }
 
+    public Meet getItem (int pos) {
+        return meetList.get(pos);
+
+    }
+
+    public void restoreItem(Meet model, int position) {
+        meetList.add(position, model);
+        // notify item added by position
+        notifyItemInserted(position);
+        notifyItemRangeChanged(position, meetList.size());
+    }
+
     @Override
     public int getItemCount() {
         return meetList.size();
@@ -53,6 +65,12 @@ public class MeetAdapter extends RecyclerView.Adapter<MeetAdapter.MyViewHolder> 
     public void clear() {
         meetList.clear();
         notifyDataSetChanged();
+    }
+
+    public void removeItem(int position) {
+        meetList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, meetList.size());
     }
 
     // Add a list of items -- change to type used

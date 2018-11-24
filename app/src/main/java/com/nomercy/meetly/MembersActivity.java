@@ -21,11 +21,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ public class MembersActivity extends AppCompatActivity {
    ArrayList<User> users = new ArrayList<>();
     ImageButton btnDone;
     StringBuilder stringBuilder = null;
+    EditText editSearch;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -52,6 +56,7 @@ public class MembersActivity extends AppCompatActivity {
         //getSupportLoaderManager().initLoader(1, null, this);
         members = findViewById(R.id.membersList);
         btnDone = findViewById(R.id.btnDone);
+        editSearch = findViewById(R.id.edit_search);
         int hasReadContactPermission = ContextCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.READ_CONTACTS);
         if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             READ_CONTACTS_GRANTED = true;
@@ -96,6 +101,24 @@ public class MembersActivity extends AppCompatActivity {
                 }
             }
         });
+        editSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                adapter.getFilter().filter(charSequence);
+                return;
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
     }
 
@@ -116,6 +139,8 @@ public class MembersActivity extends AppCompatActivity {
         }
 
     }
+
+
 
     public void getContacts() {
         Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;

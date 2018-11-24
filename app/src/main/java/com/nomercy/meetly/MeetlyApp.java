@@ -5,12 +5,21 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Movie;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,10 +31,12 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -77,7 +88,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     Retrofit retrofit;
     DBHelper mDBHelper;
     int auth;
-
+    private Paint p = new Paint();
     ArrayList<Meet> curMeet= new ArrayList<>();
 
 
@@ -141,6 +152,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 ////            }
 //        }
 
+      //  enableSwipe();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -149,6 +161,111 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
             }
         });
+    }
+
+    private void enableSwipe(){
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+
+                if (direction == ItemTouchHelper.LEFT){
+                    final Meet deletedModel = (Meet) mAdapter.getItem(position);
+                    final int deletedPosition = position;
+//                    word = mDBHelper.getValue(deletedModel);
+//                    mDBHelper.removeBookmark(deletedModel);
+                    mAdapter.removeItem(position);
+                    mAdapter.notifyDataSetChanged();
+
+                    // showing snack bar with Undo option
+                    InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+                    //getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel, Snackbar.LENGTH_LONG);
+                    snackbar.setAction("Отменить", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                           getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                            // undo is selected, restore the deleted item
+                            mAdapter.restoreItem(deletedModel, deletedPosition);
+                            //mDBHelper.addBookmark(word.key, word.value);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    snackbar.setActionTextColor(Color.YELLOW);
+                    snackbar.show();
+                } else {
+                    final Meet deletedModel = (Meet) mAdapter.getItem(position);
+                    final int deletedPosition = position;
+//                    word = mDBHelper.getValue(deletedModel);
+//                    mDBHelper.removeBookmark(deletedModel);
+                    mAdapter.removeItem(position);
+                    mAdapter.notifyDataSetChanged();
+                    // showing snack bar with Undo option
+                    InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+                    // getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel, Snackbar.LENGTH_LONG);
+                    snackbar.setAction("Отменить", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                            // undo is selected, restore the deleted item
+                            mAdapter.restoreItem(deletedModel, deletedPosition);
+//                            mDBHelper.addBookmark(word.key, word.value);
+//                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    snackbar.setActionTextColor(Color.YELLOW);
+                    snackbar.show();
+                }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+                    View itemView = viewHolder.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    float width = height / 3;
+                    if(dX > 0){
+                        p.setColor(Color.parseColor("#692069"));
+                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
+                        c.drawRect(background,p);
+                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
+                        Drawable drawable = ContextCompat.getDrawable(MeetlyApp.this,R.drawable.ic_delete);
+                        Bitmap icon2 = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(icon2);
+                        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        drawable.draw(canvas);
+                        c.drawBitmap(icon2, null, icon_dest, p);
+                    } else {
+                        p.setColor(Color.parseColor("#692069"));
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background,p);
+                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
+                        Drawable drawable = ContextCompat.getDrawable(MeetlyApp.this,R.drawable.ic_delete);
+                        Bitmap icon2 = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(icon2);
+                        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        drawable.draw(canvas);
+                        c.drawBitmap(icon2, null, icon_dest, p);
+
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
 //    public void explainText() {
