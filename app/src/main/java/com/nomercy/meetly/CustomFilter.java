@@ -2,7 +2,7 @@ package com.nomercy.meetly;
 
 import android.widget.Filter;
 
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
 
 import java.util.ArrayList;
 

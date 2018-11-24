@@ -33,6 +33,16 @@
             android:layout_toRightOf="@+id/imgMeet"
             />
 
+    <TextView
+        android:textColor="@color/colorProjectWhite"
+        android:textSize="13dp"
+        android:id="@+id/meetId"
+        android:layout_marginLeft="4dp"
+        android:inputType="numberDecimal"
+        android:layout_toRightOf="@id/nameMeet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/descriptionMeet"
             android:layout_width="wrap_content"

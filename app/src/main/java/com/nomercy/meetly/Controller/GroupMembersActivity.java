@@ -1,21 +1,16 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -23,43 +18,42 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
+import com.nomercy.meetly.R;
+import com.nomercy.meetly.UserAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MembersActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE_READ_CONTACTS = 1;
-    private static boolean READ_CONTACTS_GRANTED = false;
+public class GroupMembersActivity extends AppCompatActivity {
+    public static final int REQUEST_CODE_READ_CONTACTS = 1;
+    public static boolean READ_CONTACTS_GRANTED = false;
     RecyclerView members;
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
     UserAdapter adapter;
     User user;
-   ArrayList<User> users = new ArrayList<>();
-    ImageButton btnDone;
+    ArrayList<User> users = new ArrayList<>();
     StringBuilder stringBuilder = null;
     EditText editSearch;
+    ImageButton btnDone;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState)  {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_members);
-        //getSupportLoaderManager().initLoader(1, null, this);
         members = findViewById(R.id.membersList);
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
         int hasReadContactPermission = ContextCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.READ_CONTACTS);
         if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             READ_CONTACTS_GRANTED = true;
+
 
         } else {
             // вызываем диалоговое окно для установки разрешений
@@ -75,30 +69,30 @@ public class MembersActivity extends AppCompatActivity {
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stringBuilder = new StringBuilder();
-                int i=0;
-                char ch = ',';
-                do{
-                    User user = adapter.checkedUsers.get(i);
-                    if(i == adapter.checkedUsers.size()-1) ch = '.';
-                    stringBuilder.append(user.getName() + ch);
-                    if(i != adapter.checkedUsers.size() -1) {
-                        stringBuilder.append("\n");
-                    }
-                    i++;
-
-                } while (i < adapter.checkedUsers.size());
-                if(adapter.checkedUsers.size() > 0) {
-                    Intent intent = new Intent();
-                    intent.putExtra("names", stringBuilder.toString());
-                    setResult(RESULT_OK, intent);
-                    finish();
-
-
-                } else {
-                    Toast.makeText(MembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
-
-                }
+//                stringBuilder = new StringBuilder();
+//                int i=0;
+//                char ch = ',';
+//                do{
+//                    User user = adapter.checkedUsers.get(i);
+//                    if(i == adapter.checkedUsers.size()-1) ch = '.';
+//                    stringBuilder.append(user.getName() + ch);
+//                    if(i != adapter.checkedUsers.size() -1) {
+//                        stringBuilder.append("\n");
+//                    }
+//                    i++;
+//
+//                } while (i < adapter.checkedUsers.size());
+//                if(adapter.checkedUsers.size() > 0) {
+//                    Intent intent = new Intent();
+//                    intent.putExtra("names", stringBuilder.toString());
+//                    setResult(RESULT_OK, intent);
+//                    finish();
+//
+//
+//                } else {
+//                    Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
+//
+//                }
             }
         });
         editSearch.addTextChangedListener(new TextWatcher() {
@@ -119,7 +113,6 @@ public class MembersActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -139,7 +132,6 @@ public class MembersActivity extends AppCompatActivity {
         }
 
     }
-
 
 
     public void getContacts() {
@@ -179,8 +171,7 @@ public class MembersActivity extends AppCompatActivity {
                 }
             }
         }
-//        Toast.makeText(this, "size: " + tell.size(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "size con: " + contacts.size(), Toast.LENGTH_SHORT).show();
+
         if(tell.size() > contacts.size()) {
             for(int i=0; i <contacts.size(); i++) {
                 user = new User(tell.get(i), contacts.get(i));
@@ -199,9 +190,6 @@ public class MembersActivity extends AppCompatActivity {
         members.setItemAnimator(new DefaultItemAnimator());
         members.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         members.setAdapter(adapter);
-        //contactList.setAdapter(adapter2);
-
-
     }
 
 
@@ -214,7 +202,4 @@ public class MembersActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-
-
 }

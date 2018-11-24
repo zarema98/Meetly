@@ -1,17 +1,12 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +14,17 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.nomercy.meetly.DatePickerFragment;
+import com.nomercy.meetly.Model.DBHelper;
+import com.nomercy.meetly.R;
+import com.nomercy.meetly.TimePickerFragment;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
 
-import java.text.DateFormat;
 import java.util.Calendar;
 
 import okhttp3.OkHttpClient;

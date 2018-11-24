@@ -1,14 +1,20 @@
 package com.nomercy.meetly.api;
 
-import com.nomercy.meetly.GroupList;
-import com.nomercy.meetly.Groups;
-import com.nomercy.meetly.MeetList;
-import com.nomercy.meetly.Place;
+import com.nomercy.meetly.Model.GroupList;
+import com.nomercy.meetly.Model.Groups;
+import com.nomercy.meetly.Model.Meet;
+import com.nomercy.meetly.Model.MeetList;
+import com.nomercy.meetly.Model.Place;
+import com.nomercy.meetly.Model.User;
+
+import java.security.acl.Group;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -85,8 +91,25 @@ public interface APIInterface {
 
     );
 
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "/api/meets/deleteMeet", hasBody = true)
+    Call<Meet>deleteMeet(
+            @Field("user_id") int user_id,
+            @Field("meet_id") int meet_id
+    );
 
 
+    @FormUrlEncoded
+    @POST("/api/meets/restoreMeet")
+    Call<Meet>restoreMeet(
+            @Field("user_id") int user_id,
+            @Field("meet_id") int meet_id
+    );
 
+    @GET("/api/groups/addMembersToGroup")
+    Call<Group>addMembers(
+            @Field("members_array") int []participant,
+            @Field("group_id") int group_id
+    );
 }
 

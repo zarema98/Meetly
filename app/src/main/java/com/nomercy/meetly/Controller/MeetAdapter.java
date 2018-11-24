@@ -1,6 +1,5 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
-import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,19 +7,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.nomercy.meetly.Model.Meet;
+import com.nomercy.meetly.R;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class MeetAdapter extends RecyclerView.Adapter<MeetAdapter.MyViewHolder> {
         private ArrayList<Meet> meetList;
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView nameMeet, descriptionMeet, dateMeet;
+        public TextView nameMeet, descriptionMeet, dateMeet, idMeet;
 
         public MyViewHolder(View view) {
             super(view);
             nameMeet = view.findViewById(R.id.nameMeet);
             descriptionMeet =view.findViewById(R.id.descriptionMeet);
             dateMeet = view.findViewById(R.id.dataMeet);
+            idMeet = view.findViewById(R.id.meetId);
         }
     }
 
@@ -43,11 +45,16 @@ public class MeetAdapter extends RecyclerView.Adapter<MeetAdapter.MyViewHolder> 
         holder.nameMeet.setText(meet.getName());
         holder.descriptionMeet.setText(meet.getDescription());
         holder.dateMeet.setText(meet.getDate());
+        holder.idMeet.setText(String.valueOf(meet.getMeet_id()));
     }
 
     public Meet getItem (int pos) {
         return meetList.get(pos);
 
+    }
+
+    public int getItemid (int pos) {
+        return meetList.get(pos).meet_id;
     }
 
     public void restoreItem(Meet model, int position) {

@@ -1,21 +1,14 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -27,37 +20,28 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.support.design.widget.NavigationView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.nomercy.meetly.Model.DBHelper;
+import com.nomercy.meetly.Model.Meet;
+import com.nomercy.meetly.Model.MeetList;
+import com.nomercy.meetly.R;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -152,7 +136,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 ////            }
 //        }
 
-      //  enableSwipe();
+       enableSwipe();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -173,55 +157,106 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
+               final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT){
-                    final Meet deletedModel = (Meet) mAdapter.getItem(position);
+                    final Meet deletedModel =  mAdapter.getItem(position);
                     final int deletedPosition = position;
-//                    word = mDBHelper.getValue(deletedModel);
-//                    mDBHelper.removeBookmark(deletedModel);
-                    mAdapter.removeItem(position);
-                    mAdapter.notifyDataSetChanged();
+                    APIInterface service = retrofit.create(APIInterface.class);
+                   final  int id = mDBHelper.getId();
+                   final int meet_id = mAdapter.getItemid(position);
+                    Call<Meet> call = service.deleteMeet(id, meet_id);
+                    call.enqueue(new Callback<Meet>() {
+                        @Override
+                        public void onResponse(Call<Meet> call, Response<Meet> response) {
+                            mAdapter.removeItem(position);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                        @Override
+                        public void onFailure(Call<Meet> call, Throwable t) {
+                        }
+                    });
 
                     // showing snack bar with Undo option
                     InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
-                    //getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ) {
+                        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+                    }
 
-                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel, Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel.getName(), Snackbar.LENGTH_LONG);
                     snackbar.setAction("Отменить", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
                             // undo is selected, restore the deleted item
-                            mAdapter.restoreItem(deletedModel, deletedPosition);
-                            //mDBHelper.addBookmark(word.key, word.value);
-                            mAdapter.notifyDataSetChanged();
+                            APIInterface service = retrofit.create(APIInterface.class);
+                            Call<Meet> call = service.restoreMeet(id, meet_id);
+                            call.enqueue(new Callback<Meet>() {
+                                @Override
+                                public void onResponse(Call<Meet> call, Response<Meet> response) {
+                                    mAdapter.restoreItem(deletedModel, deletedPosition);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                @Override
+                                public void onFailure(Call<Meet> call, Throwable t) {
+                                }
+                            });
+
                         }
                     });
                     snackbar.setActionTextColor(Color.YELLOW);
                     snackbar.show();
                 } else {
-                    final Meet deletedModel = (Meet) mAdapter.getItem(position);
+                    final Meet deletedModel =  mAdapter.getItem(position);
                     final int deletedPosition = position;
-//                    word = mDBHelper.getValue(deletedModel);
-//                    mDBHelper.removeBookmark(deletedModel);
-                    mAdapter.removeItem(position);
-                    mAdapter.notifyDataSetChanged();
-                    // showing snack bar with Undo option
+                    APIInterface service = retrofit.create(APIInterface.class);
+                   final int id = mDBHelper.getId();
+                   final int meet_id = mAdapter.getItemid(position);
+                    Call<Meet> call = service.deleteMeet(id, meet_id);
+                    call.enqueue(new Callback<Meet>() {
+                        @Override
+                        public void onResponse(Call<Meet> call, Response<Meet> response) {
+                            mAdapter.removeItem(position);
+                            mAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Meet> call, Throwable t) {
+                        }
+                    });
                     InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
-                    // getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-
-                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel, Snackbar.LENGTH_LONG);
+                    if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ) {
+                        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+                    }
+                    Snackbar snackbar = Snackbar.make(getWindow().getDecorView().getRootView(), " Удалено " + deletedModel.getName(), Snackbar.LENGTH_LONG);
                     snackbar.setAction("Отменить", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-                            // undo is selected, restore the deleted item
-                            mAdapter.restoreItem(deletedModel, deletedPosition);
-//                            mDBHelper.addBookmark(word.key, word.value);
-//                            adapter.notifyDataSetChanged();
+                            APIInterface service = retrofit.create(APIInterface.class);
+                            Call<Meet> call = service.restoreMeet(id, meet_id);
+                            call.enqueue(new Callback<Meet>() {
+                                @Override
+                                public void onResponse(Call<Meet> call, Response<Meet> response) {
+                                    mAdapter.restoreItem(deletedModel, deletedPosition);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                                @Override
+                                public void onFailure(Call<Meet> call, Throwable t) {
+                                }
+                            });
                         }
                     });
                     snackbar.setActionTextColor(Color.YELLOW);

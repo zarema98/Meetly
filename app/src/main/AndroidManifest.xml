@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/HandbookCalculateTheme">
         <activity
-            android:name=".MeetlyApp"
+            android:name=".Controller.MeetlyApp"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,14 +23,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MembersActivity"
+            android:name=".Controller.MembersActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".NewPlace"
+            android:name=".Controller.NewPlace"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".GroupsMain"
+            android:name=".Controller.GroupsMain"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".Controller.GroupMembersActivity"
             android:screenOrientation="portrait">
         </activity>
     </application>

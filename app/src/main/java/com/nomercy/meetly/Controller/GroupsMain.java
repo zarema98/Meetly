@@ -1,8 +1,8 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,11 +12,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.nomercy.meetly.Model.DBHelper;
+import com.nomercy.meetly.Model.GroupList;
+import com.nomercy.meetly.Model.Groups;
+import com.nomercy.meetly.R;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
-import com.nomercy.meetly.api.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +34,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GroupsMain extends AppCompatActivity {
+    ImageButton btnAddMembers;
     private List<Groups> groupsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private GroupsAdapter mAdapter;
@@ -46,6 +51,7 @@ public class GroupsMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_groups);
         mDbHelper = new DBHelper(this);
+        btnAddMembers = findViewById(R.id.buttonAddMembersToGroup);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -79,7 +85,15 @@ public class GroupsMain extends AppCompatActivity {
 
             }
         });
-        fab = (FloatingActionButton) findViewById(R.id.fabBtn);
+
+        btnAddMembers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GroupsMain.this, GroupMembersActivity.class);
+                startActivity(intent);
+            }
+        });
+        fab =  findViewById(R.id.fabBtn);
 
 //        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
 //            @Override

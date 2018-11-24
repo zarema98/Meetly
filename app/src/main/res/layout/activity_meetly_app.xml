@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackgroundLight"
     android:orientation="vertical"
-    tools:context=".MeetlyApp">
+    tools:context=".Controller.MeetlyApp">
 
 
 

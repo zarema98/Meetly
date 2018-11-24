@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Model;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -9,7 +9,17 @@ import java.util.Date;
 public class Meet implements Serializable {
     @SerializedName("meet_id")
     public int meet_id;
+
+    public int getMeet_id() {
+        return meet_id;
+    }
+
+    public void setMeet_id(int meet_id) {
+        this.meet_id = meet_id;
+    }
+
     @SerializedName("name")
+
     public String name;
     @SerializedName("description")
     public String description;

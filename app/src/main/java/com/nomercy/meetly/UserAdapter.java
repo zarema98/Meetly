@@ -7,21 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
 
 import java.util.ArrayList;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> implements Filterable {
 
-    private Context context;
-    ArrayList<User> users = new ArrayList<>();
-    ArrayList<User> checkedUsers = new ArrayList<>();
+    public Context context;
+    public ArrayList<User> users = new ArrayList<>();
+   public ArrayList<User> checkedUsers = new ArrayList<>();
     CustomFilter filter;
 
     public UserAdapter(ArrayList<User> users, Context context) {

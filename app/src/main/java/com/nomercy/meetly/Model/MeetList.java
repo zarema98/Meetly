@@ -1,6 +1,7 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Model;
 
 import com.google.gson.annotations.SerializedName;
+import com.nomercy.meetly.Model.Meet;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.nomercy.meetly.Model.Groups;
+import com.nomercy.meetly.R;
 
 import java.util.List;
 

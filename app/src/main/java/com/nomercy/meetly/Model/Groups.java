@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Model;
 
 import com.google.gson.annotations.SerializedName;
 

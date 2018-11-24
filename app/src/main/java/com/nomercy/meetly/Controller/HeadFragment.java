@@ -1,16 +1,17 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.nomercy.meetly.Controller.AuthorizationFragment;
+import com.nomercy.meetly.Controller.MeetlyApp;
+import com.nomercy.meetly.R;
 
 
 public class HeadFragment extends Fragment {

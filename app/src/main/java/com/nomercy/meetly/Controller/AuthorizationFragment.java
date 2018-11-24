@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nomercy.meetly.Model.DBHelper;
+import com.nomercy.meetly.R;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
-import com.nomercy.meetly.api.User;
+import com.nomercy.meetly.Model.User;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,10 +10,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +21,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.nomercy.meetly.Controller.AuthorizationFragment;
+import com.nomercy.meetly.Controller.MeetlyApp;
+import com.nomercy.meetly.R;
 
 import java.util.ArrayList;
 import java.util.Objects;
