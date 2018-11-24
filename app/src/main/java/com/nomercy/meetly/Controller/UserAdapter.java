@@ -1,4 +1,4 @@
-package com.nomercy.meetly;
+package com.nomercy.meetly.Controller;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,10 +10,24 @@ import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.nomercy.meetly.CustomFilter;
+import com.nomercy.meetly.ItemClickListener;
 import com.nomercy.meetly.Model.User;
+import com.nomercy.meetly.R;
+import com.nomercy.meetly.api.APIInterface;
+import com.nomercy.meetly.api.Constants;
 
 import java.util.ArrayList;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> implements Filterable {
 
@@ -21,6 +35,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
     public ArrayList<User> users = new ArrayList<>();
    public ArrayList<User> checkedUsers = new ArrayList<>();
     CustomFilter filter;
+    Retrofit retrofit;
 
     public UserAdapter(ArrayList<User> users, Context context) {
         this.users = users;
@@ -51,11 +66,34 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
             @Override
             public void onItemClick(View v, int pos) {
                 CheckBox checkBox = (CheckBox)v;
-                User member = users.get(pos);
+                final User member = users.get(pos);
 
                 if(checkBox.isChecked()) {
                     member.setSelected(true);
-                    checkedUsers.add(member);
+                    APIInterface service = retrofit.create(APIInterface.class);
+                    String telephone = member.getTelephone().replaceAll("[()\\s-]+", "");
+                    final Call<User> call = service.checkPhoneNumber(telephone);
+                    call.enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, Response<User> response) {
+                            response.body();
+                            int id = response.body().getId();
+                            Toast.makeText(context, "id: " + id , Toast.LENGTH_LONG).show();
+                            if(id != 0) {
+                                member.setId(id);
+                                checkedUsers.add(member);
+                            } else {
+                                checkedUsers.add(member);
+                            }
+
+                        }
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+
+                        }
+                    });
+
+
 
                 } else if(!checkBox.isChecked()) {
                     member.setSelected(false);
@@ -87,6 +125,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
             super(itemView);
             memberName = itemView.findViewById(R.id.membersName);
             checkBox = itemView.findViewById(R.id.checkbox);
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            //The logging interceptor will be added to the http client
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+            httpClient.addInterceptor(logging);
+
+            retrofit = new Retrofit.Builder()
+                    .client(httpClient.build())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .baseUrl(Constants.BaseUrl)
+                    .build();
 
             checkBox.setOnClickListener(this);
         }

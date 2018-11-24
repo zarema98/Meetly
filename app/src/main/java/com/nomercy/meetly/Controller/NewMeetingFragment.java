@@ -25,6 +25,7 @@ import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
 import com.nomercy.meetly.Model.User;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.OkHttpClient;
@@ -49,6 +50,7 @@ public class NewMeetingFragment extends Fragment  {
     String message;
     int id_of_another_place;
 
+    ArrayList<Integer> ids = new ArrayList<>();
     public interface onSomeEventListener {
         void someEvent(String s);
     }
@@ -133,6 +135,8 @@ public class NewMeetingFragment extends Fragment  {
             // Toast.makeText(getContext(), String.valueOf(place_id), Toast.LENGTH_LONG).show();
         } else if(requestCode ==2) {
             String names = data.getStringExtra("names");
+            ids = data.getIntegerArrayListExtra("ids");
+          //  Toast.makeText(getContext(), "size: " + ids.size(), Toast.LENGTH_SHORT).show();
             String edit = membersInput.getText().toString();
             if(edit.length() > 0) {
                 membersInput.getText().replace(edit.length()-1, edit.length(), ",");
@@ -241,6 +245,12 @@ public class NewMeetingFragment extends Fragment  {
        time = timeInput.getText().toString();
        descriptionS = description.getText().toString();
        id = mDbHelper.getId();
+       if(ids.size() == 0 ) {
+           ids.add(63);
+           ids.add(64);
+       } else if(ids.size() == 1) {
+           ids.add(63);
+       }
 
        if (nameS.equals("")) {
            name.setError("Название встречи должно быть заполнено");
@@ -264,7 +274,8 @@ public class NewMeetingFragment extends Fragment  {
            else place = 1;
 
 
-       Call<User> call = service.post(nameS, date, time, descriptionS, "photo", place, new int[]{65, 63, 64}, id);
+
+       Call<User> call = service.post(nameS, date, time, descriptionS, "photo", place, ids, id);
        call.enqueue(new Callback<User>() {
            @Override
            public void onResponse(Call<User> call, Response<User> response) {

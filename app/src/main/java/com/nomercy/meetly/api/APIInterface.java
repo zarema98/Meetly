@@ -8,6 +8,7 @@ import com.nomercy.meetly.Model.Place;
 import com.nomercy.meetly.Model.User;
 
 import java.security.acl.Group;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.DELETE;
@@ -54,7 +55,7 @@ public interface APIInterface {
             @Field("description") String description,
             @Field("photo") String photo,
             @Field("place_id") int place,
-            @Field("user_array") int []participant,
+            @Field("user_array") ArrayList<Integer> participant,
             @Field("user_id") int user_id
 
     );
@@ -111,5 +112,19 @@ public interface APIInterface {
             @Field("members_array") int []participant,
             @Field("group_id") int group_id
     );
+
+
+    @GET("/api/meets/checkPhoneNumber/{telephone}")
+    Call<User>checkPhoneNumber(
+            @Path("telephone") String telephone
+    );
+
+    @FormUrlEncoded
+    @POST("/api/groups/addMembersToGroup")
+    Call<Groups>addMembersToGroup(
+            @Field("members") ArrayList<Integer> members,
+            @Field("group_id") int group_id
+    );
+
 }
 

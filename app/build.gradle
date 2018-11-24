@@ -47,13 +47,13 @@ dependencies {
 
 
     ///firebase
-//    implementation 'com.google.firebase:firebase-core:16.0.1'
-//    implementation 'com.google.firebase:firebase-messaging:17.1.0'
-//    implementation 'com.pusher:push-notifications-android:1.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+
 
     implementation "ru.tinkoff.decoro:decoro:1.1.1"
     implementation 'com.android.support:support-v4:27.1.1'
 
 }
+apply plugin: 'com.google.gms.google-services'
 
 

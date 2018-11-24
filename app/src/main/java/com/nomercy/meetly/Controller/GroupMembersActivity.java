@@ -2,7 +2,6 @@ package com.nomercy.meetly.Controller;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,7 +24,6 @@ import android.widget.Toast;
 
 import com.nomercy.meetly.Model.User;
 import com.nomercy.meetly.R;
-import com.nomercy.meetly.UserAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;

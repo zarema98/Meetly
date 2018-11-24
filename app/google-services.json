@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "499442688690",
-    "firebase_url": "https://hackaton2k18.firebaseio.com",
-    "project_id": "hackaton2k18",
-    "storage_bucket": "hackaton2k18.appspot.com"
+    "project_number": "191609250364",
+    "firebase_url": "https://meetlyapp.firebaseio.com",
+    "project_id": "meetlyapp",
+    "storage_bucket": "meetlyapp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:499442688690:android:2bc4631fe867cbdd",
+        "mobilesdk_app_id": "1:191609250364:android:2bc4631fe867cbdd",
         "android_client_info": {
           "package_name": "com.nomercy.meetly"
         }
       },
       "oauth_client": [
         {
-          "client_id": "499442688690-bhvaipq0qtrn0o3uj31gg75v0u45iht9.apps.googleusercontent.com",
+          "client_id": "191609250364-sngvhjoh02f5ld7k3fhn43hnuqk4eff4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBbhqG9mRf_6ucqf3w0Z44PatkwwIwee5Y"
+          "current_key": "AIzaSyDVtEJ8U6baPGXzmoHecUtD2ia6lZYGgG0"
         }
       ],
       "services": {

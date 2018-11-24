@@ -1,10 +1,13 @@
 package com.nomercy.meetly.Controller;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.net.Uri;
@@ -19,20 +22,22 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.nomercy.meetly.Model.User;
 import com.nomercy.meetly.R;
-import com.nomercy.meetly.UserAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class MembersActivity extends AppCompatActivity {
-    public static final int REQUEST_CODE_READ_CONTACTS = 1;
-    public static boolean READ_CONTACTS_GRANTED = false;
+    Cursor cursor ;
+    String name, phonenumber ;
+    public  static final int RequestPermissionCode  = 1 ;
     RecyclerView members;
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
@@ -50,50 +55,59 @@ public class MembersActivity extends AppCompatActivity {
         members = findViewById(R.id.membersList);
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
-        int hasReadContactPermission = ContextCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.READ_CONTACTS);
-        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
-            READ_CONTACTS_GRANTED = true;
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        enableRuntimePermission();
+        getContacts();
 
-        } else {
-            // вызываем диалоговое окно для установки разрешений
-            ActivityCompat.requestPermissions(Objects.requireNonNull(this), new
-                    String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
-
-        }
-        // если разрешение установлено, загружаем контакты
-        if (READ_CONTACTS_GRANTED) {
-            getContacts();
-        }
-
-        btnDone.setOnClickListener(new View.OnClickListener() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                stringBuilder = new StringBuilder();
-                int i=0;
-                char ch = ',';
-                do{
-                    User user = adapter.checkedUsers.get(i);
-                    if(i == adapter.checkedUsers.size()-1) ch = '.';
-                    stringBuilder.append(user.getName() + ch);
-                    if(i != adapter.checkedUsers.size() -1) {
-                        stringBuilder.append("\n");
+            public void run() {
+                btnDone.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        stringBuilder = new StringBuilder();
+                        int i=0;
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        String [] telephones = new String[adapter.checkedUsers.size()];
+                        char ch = ',';
+                        do {
+                            User user = adapter.checkedUsers.get(i);
+                            if(user.getId() != 0)
+                                ids.add(user.getId());
+                            telephones[i] = user.getTelephone();
+                            if(i == adapter.checkedUsers.size()-1) ch = '.';
+                            stringBuilder.append(user.getName() + ch);
+                            if(i != adapter.checkedUsers.size() -1) {
+                                stringBuilder.append("\n");
+                            }
+                            i++;
+
+                        } while (i < adapter.checkedUsers.size());
+                        if(adapter.checkedUsers.size() > 0) {
+                            Intent intent = new Intent();
+                            intent.putExtra("names", stringBuilder.toString());
+                            // Toast.makeText(MembersActivity.this, "tel: " + telephones[0], Toast.LENGTH_LONG).show();
+//                    if(ids.size() > 0) {
+//                        Toast.makeText(MembersActivity.this, "size: " + ids.size(), Toast.LENGTH_LONG).show();
+//                    }
+                            intent.putExtra("ids", ids);
+
+                            setResult(RESULT_OK, intent);
+                            finish();
+
+
+                        } else {
+                            Toast.makeText(MembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
+
+                        }
                     }
-                    i++;
-
-                } while (i < adapter.checkedUsers.size());
-                if(adapter.checkedUsers.size() > 0) {
-                    Intent intent = new Intent();
-                    intent.putExtra("names", stringBuilder.toString());
-                    setResult(RESULT_OK, intent);
-                    finish();
+                });
 
 
-                } else {
-                    Toast.makeText(MembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
-
-                }
             }
-        });
+        },1500);
+
         editSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -115,65 +129,52 @@ public class MembersActivity extends AppCompatActivity {
 
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_READ_CONTACTS:
-                if (grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    READ_CONTACTS_GRANTED = true;
 
+    @Override
+    public void onRequestPermissionsResult(int RC, String per[], int[] PResult) {
+        switch (RC) {
+            case RequestPermissionCode:
+                if (PResult.length > 0 && PResult[0] == PackageManager.PERMISSION_GRANTED) {
+              //      Toast.makeText(MembersActivity.this,"Permission Granted, Now your application can access CONTACTS.", Toast.LENGTH_LONG).show();
+                } else {
+                    //Toast.makeText(MembersActivity.this,"Permission Canceled, Now your application cannot access CONTACTS.", Toast.LENGTH_LONG).show();
                 }
+                break;
         }
-        if (READ_CONTACTS_GRANTED) {
-            getContacts();
-        }
-        else {
-            Toast.makeText(this, "Требуется установить разрешения", Toast.LENGTH_LONG).show();
-        }
+    }
 
+    public void enableRuntimePermission(){
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                MembersActivity.this,
+                Manifest.permission.READ_CONTACTS)) {
+           // Toast.makeText(MembersActivity.this,"CONTACTS permission allows us to Access CONTACTS app", Toast.LENGTH_LONG).show();
+
+        } else {
+            ActivityCompat.requestPermissions(MembersActivity.this,new String[]{
+                    Manifest.permission.READ_CONTACTS}, RequestPermissionCode);
+        }
     }
 
 
 
+
     public void getContacts() {
-        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
-        String _ID = ContactsContract.Contacts._ID;
-        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
-        String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
+        cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, null);
 
-        Uri PhoneCONTENT_URI =
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String Phone_CONTACT_ID =
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
-        String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
+        while (cursor.moveToNext()) {
 
-        StringBuffer output = new StringBuffer();
-        ContentResolver contentResolver = Objects.requireNonNull(this).getContentResolver();
-        Cursor cursor = contentResolver.query(CONTENT_URI, null, null, null, null);
-        //Запускаем цикл обработчик для каждого контакта:
-        if (cursor.getCount() > 0) {
-//Если значение имени и номера контакта больше 0 (то есть они существуют) выбираем
-            //их значения в приложение привязываем с соответствующие поля "Имя" и "Номер":
-            while (cursor.moveToNext()) {
-                String contact_id = cursor.getString(cursor.getColumnIndex(_ID));
-                String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
-//Получаем имя:
-                if (hasPhoneNumber > 0) {
-                    contacts.add(name);
-//contacts.add("\n Имя: " + name);
-                    Cursor phoneCursor =
-                            contentResolver.query(PhoneCONTENT_URI, null,
-                                    Phone_CONTACT_ID + " = ?", new String[]{contact_id}, null);
-                    while (phoneCursor.moveToNext()) {
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
-                        tell.add(phoneNumber);
-                    }
-                }
-            }
+
+            name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+
+            phonenumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+
+            contacts.add(name);
+            tell.add(phonenumber);
         }
-//        Toast.makeText(this, "size: " + tell.size(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "size con: " + contacts.size(), Toast.LENGTH_SHORT).show();
+        cursor.close();
+
         if(tell.size() > contacts.size()) {
             for(int i=0; i <contacts.size(); i++) {
                 user = new User(tell.get(i), contacts.get(i));
@@ -184,6 +185,9 @@ public class MembersActivity extends AppCompatActivity {
                 user = new User(tell.get(i), contacts.get(i));
                 users.add(user);
             }
+//            Toast.makeText(MembersActivity.this, "size cont: " + contacts.size(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(MembersActivity.this, "size TEl: " + tell.size(), Toast.LENGTH_LONG).show();
+
         }
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
