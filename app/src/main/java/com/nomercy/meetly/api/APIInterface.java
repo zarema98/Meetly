@@ -3,6 +3,7 @@ package com.nomercy.meetly.api;
 import com.nomercy.meetly.GroupList;
 import com.nomercy.meetly.Groups;
 import com.nomercy.meetly.MeetList;
+import com.nomercy.meetly.Place;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -73,6 +74,17 @@ public interface APIInterface {
     Call<GroupList>getGroup(
             @Path("id") int id
     );
+
+
+    @FormUrlEncoded
+    @POST("/api/meets/anotherPlace")
+    Call<Place>postPlace(
+            @Field("name") String name,
+            @Field("adress") String adress
+
+
+    );
+
 
 
 

@@ -39,6 +39,7 @@ public class GroupsMain extends AppCompatActivity {
     String groupName;
     int user_id;
     private SwipeRefreshLayout swipeContainer;
+    ArrayList<Groups> curGroups = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,8 @@ public class GroupsMain extends AppCompatActivity {
                 View mView = getLayoutInflater().inflate(R.layout.dialog_login, null);
                 final EditText nameGroup = mView.findViewById(R.id.inputNameGroup);
                 Button ok = mView.findViewById(R.id.btnOk);
+                builder.setView(mView);
+                final AlertDialog dialog = builder.create();
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -115,6 +118,7 @@ public class GroupsMain extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Call<Groups> call, Response<Groups> response) {
                                     response.body();
+                                    dialog.dismiss();
                                     Toast.makeText(GroupsMain.this, "Группа успешно создана. Обновите страницу", Toast.LENGTH_LONG).show();
                                 }
                                 @Override
@@ -125,8 +129,7 @@ public class GroupsMain extends AppCompatActivity {
                         }
                     }
                 });
-                builder.setView(mView);
-                AlertDialog dialog = builder.create();
+
                 dialog.show();
             }
         });
@@ -160,8 +163,13 @@ public class GroupsMain extends AppCompatActivity {
     }
 
     public void generateGroup(ArrayList<Groups> groupDataList) {
+        Groups groups;
+        for(int i=0; i < groupDataList.size(); i++) {
+            groups = new Groups(groupDataList.get(i).getGroupName(), R.drawable.groups);
+            curGroups.add(groups);
+        }
         recyclerView = findViewById(R.id.recyclerGroups);
-        mAdapter = new GroupsAdapter(groupDataList);
+        mAdapter = new GroupsAdapter(curGroups);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

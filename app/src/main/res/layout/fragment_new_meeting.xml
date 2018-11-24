@@ -246,7 +246,7 @@
                     android:layout_marginStart="5dp"
                     android:background="@drawable/fields"
                     android:ems="10"
-                    android:inputType="text"
+                    android:inputType="none"
                     android:padding="5dp"
                     android:textColor="@color/colorProjectTextDark"
                     android:textSize="14sp"

@@ -11,6 +11,8 @@ public class Groups {
     @SerializedName("name")
     private String groupName;
 
+    private int groupImage;
+
     public int getGroup_id() {
         return group_id;
     }
@@ -19,7 +21,7 @@ public class Groups {
         this.group_id = group_id;
     }
 
-    private int groupImage;
+
 
     public Groups(String groupName,  int groupImage){
 

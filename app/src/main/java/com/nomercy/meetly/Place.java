@@ -1,8 +1,20 @@
 package com.nomercy.meetly;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Place {
+    @SerializedName("id")
     private int id;
+    @SerializedName("name")
     private String placeName;
+
+    @SerializedName("photo")
+    String photo;
+
+    @SerializedName("adress")
+    String adress;
+
+    @SerializedName("description")
     private String placeDescription;
     private int placeImage;
 

@@ -48,8 +48,9 @@ public class NewMeetingFragment extends Fragment  {
     ProgressBar createMeetProgressBar;
     DBHelper mDbHelper;
     int id;
-    int place_id = 1;
+    int place_id;
     String message;
+    int id_of_another_place;
 
     public interface onSomeEventListener {
         void someEvent(String s);
@@ -122,9 +123,16 @@ public class NewMeetingFragment extends Fragment  {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null) {return;}
         if(requestCode ==1) {
-            String name = data.getStringExtra("name");
-            placeInput.setText(name);
-            place_id = data.getIntExtra("id", 1);
+            String name;
+            String address = data.getStringExtra("address");
+            if(data.getStringExtra("name") != null) {
+                 name = data.getStringExtra("name");
+            } else if( data.getStringExtra("another_place") != null) {
+                name = data.getStringExtra("another_place");
+            } else name = " ";
+            placeInput.setText(name + ", " + address);
+            id_of_another_place = data.getIntExtra("another_id",0);
+            place_id = data.getIntExtra("id", 0);
             // Toast.makeText(getContext(), String.valueOf(place_id), Toast.LENGTH_LONG).show();
         } else if(requestCode ==2) {
             String names = data.getStringExtra("names");
@@ -251,8 +259,15 @@ public class NewMeetingFragment extends Fragment  {
            createMeetProgressBar.setVisibility(View.VISIBLE);
            createMeetProgressBar.setProgress(20);
            createMeetProgressBar.setMax(70);
+           int place;
+           if(place_id != 0) {
+               place = place_id;
+           } else if(id_of_another_place != 0)
+               place = id_of_another_place;
+           else place = 1;
 
-       Call<User> call = service.post(nameS, date, time, descriptionS, "photo", place_id, new int[]{62, 63, 64}, id);
+
+       Call<User> call = service.post(nameS, date, time, descriptionS, "photo", place, new int[]{65, 63, 64}, id);
        call.enqueue(new Callback<User>() {
            @Override
            public void onResponse(Call<User> call, Response<User> response) {

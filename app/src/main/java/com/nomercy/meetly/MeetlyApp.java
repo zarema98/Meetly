@@ -1,9 +1,12 @@
 package com.nomercy.meetly;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Movie;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -27,7 +30,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.design.widget.NavigationView;
@@ -59,6 +64,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     ConstraintLayout meetsScreen, newMeetBar;
     int id;
     Activity activity;
+    LinearLayout ll;
 
     TextView txtEmpty;
     Adapter adapter;
@@ -72,13 +78,17 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     DBHelper mDBHelper;
     int auth;
 
+    ArrayList<Meet> curMeet= new ArrayList<>();
+
 
     public static DrawerLayout drawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-     //   txtEmpty = findViewById(R.id.txtMeetIsEmpty);
+        recyclerView = findViewById(R.id.feed);
+        ll = findViewById(R.id.linearLayout);
+
 
 
 
@@ -99,22 +109,37 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
         frameHead = findViewById(R.id.frameHead);
         frameBody = findViewById(R.id.frameBody);
         meetsScreen = findViewById(R.id.meetsScreen);
+        swipeContainer =  findViewById(R.id.swipeContainer);
         newMeetBar = findViewById(R.id.newMeetScreen);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+        authorization();
+        addListenerOnButton();
+
         getMeets();
-        swipeContainer =  findViewById(R.id.swipeContainer);
+//        curMeet = getArrayList("meets");
+//        if(curMeet != null) {
+//            if(curMeet.size() > 0) {
+//                generateMeets(curMeet);
+//            }
+////             else if(curMeet.size() <= 0) {
+////                meetsScreen.setVisibility(View.GONE);
+////                explainText();
+////            }
+//        }
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -124,29 +149,59 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
             }
         });
-
-        authorization();
-        addListenerOnButton();
-
-
     }
+
+//    public void explainText() {
+//        meetsScreen.setVisibility(View.GONE);
+//        TextView textView = new TextView(getApplicationContext());
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.WRAP_CONTENT, // Width of TextView
+//                LinearLayout.LayoutParams.WRAP_CONTENT); // Height of TextView
+//        textView.setLayoutParams(lp);
+//        textView.setText("У вас пока нет встреч. ");
+//        textView.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+//        textView.setTextSize(20);
+//        textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
+//        textView.setGravity(Gravity.CENTER | Gravity.CENTER_HORIZONTAL);
+//        ll.addView(textView);
+//
+//    }
+
+//    public void saveArrayList(ArrayList<Meet> list, String key){
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = prefs.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(list);
+//        editor.putString(key, json);
+//        editor.apply();     // This line is IMPORTANT !!!
+//    }
+//
+//    public ArrayList<Meet> getArrayList(String key){
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        Gson gson = new Gson();
+//        String json = prefs.getString(key, null);
+//        Type type = new TypeToken<ArrayList<Meet>>(){}.getType();
+//        ArrayList<Meet> meets = gson.fromJson(json, type);
+//        return meets;
+//    }
 
     public void getMeets() {
         APIInterface service = retrofit.create(APIInterface.class);
         int id = mDBHelper.getId();
-            Call<MeetList> call = service.get(id);
-            call.enqueue(new Callback<MeetList>() {
-                @Override
-                public void onResponse(Call<MeetList> call, Response<MeetList> response) {
-                  generateMeets(response.body().getMeetArrayList());
+        Call<MeetList> call = service.get(id);
+        call.enqueue(new Callback<MeetList>() {
+            @Override
+            public void onResponse(Call<MeetList> call, Response<MeetList> response) {
+               // saveArrayList(response.body().getMeetArrayList(), "meets");
+                generateMeets(response.body().getMeetArrayList());
 
-                }
+            }
 
-                @Override
-                public void onFailure(Call<MeetList> call, Throwable t) {
-                    // handle execution failures like no internet connectivity
-                }
-            });
+            @Override
+            public void onFailure(Call<MeetList> call, Throwable t) {
+                // handle execution failures like no internet connectivity
+            }
+        });
 
     }
 
@@ -154,14 +209,19 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
 
     public void generateMeets (ArrayList<Meet> meetDataList) {
-        recyclerView = findViewById(R.id.feed);
-        mAdapter = new MeetAdapter(meetDataList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        recyclerView.setAdapter(mAdapter);
-        swipeContainer.setRefreshing(false);
+        if(meetDataList.size() <=0) {
+//               explainText();
+            swipeContainer.setRefreshing(false);
+        }else {
+            mAdapter = new MeetAdapter(meetDataList);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+            recyclerView.setAdapter(mAdapter);
+            swipeContainer.setRefreshing(false);
+        }
+
 
 
     }
@@ -219,6 +279,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
         fragmentManager.beginTransaction()
                 .add(R.id.frameBody, authorizationFragment)
                 .commit();
+
     }
     @Override
     public void onBackPressed() {
@@ -312,8 +373,6 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
             });
 
-
-
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -321,32 +380,4 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
         return true;
     }
 
-
-
-
-
-
-
-
-
-    // Переход к главному экрану:
-//    void feed() {
-//        meetsScreen.setVisibility(View.VISIBLE);
-//        manager = new LinearLayoutManager(this);
-//
-//        final String[] a = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "12", "14", "15", "16", "17"};
-//        final ArrayList<String> list = new ArrayList<>(Arrays.asList(a));
-//
-//        adapter = new Adapter(list, this);
-//        feed.setAdapter(adapter);
-//        feed.setLayoutManager(manager);
-//
-//        adapter.setOnItemClickListener(new Adapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//                String name = list.get(position);
-//                Toast.makeText(MeetlyApp.this, name + " was clicked!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 }
