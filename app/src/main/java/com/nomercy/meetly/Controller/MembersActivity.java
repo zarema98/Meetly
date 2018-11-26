@@ -106,7 +106,7 @@ public class MembersActivity extends AppCompatActivity {
 
 
             }
-        },1500);
+        },2500);
 
         editSearch.addTextChangedListener(new TextWatcher() {
             @Override
