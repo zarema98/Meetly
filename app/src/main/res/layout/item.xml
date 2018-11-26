@@ -34,7 +34,7 @@
             />
 
     <TextView
-        android:textColor="@color/colorProjectWhite"
+        android:textColor="@color/colorBackgroundLight"
         android:textSize="13dp"
         android:id="@+id/meetId"
         android:layout_marginLeft="4dp"

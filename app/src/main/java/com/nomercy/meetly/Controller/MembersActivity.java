@@ -37,7 +37,7 @@ import java.util.Objects;
 public class MembersActivity extends AppCompatActivity {
     Cursor cursor ;
     String name, phonenumber ;
-    public  static final int RequestPermissionCode  = 1 ;
+
     RecyclerView members;
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
@@ -56,7 +56,6 @@ public class MembersActivity extends AppCompatActivity {
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        enableRuntimePermission();
         getContacts();
 
         final Handler handler = new Handler();
@@ -130,31 +129,7 @@ public class MembersActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int RC, String per[], int[] PResult) {
-        switch (RC) {
-            case RequestPermissionCode:
-                if (PResult.length > 0 && PResult[0] == PackageManager.PERMISSION_GRANTED) {
-              //      Toast.makeText(MembersActivity.this,"Permission Granted, Now your application can access CONTACTS.", Toast.LENGTH_LONG).show();
-                } else {
-                    //Toast.makeText(MembersActivity.this,"Permission Canceled, Now your application cannot access CONTACTS.", Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
 
-    public void enableRuntimePermission(){
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                MembersActivity.this,
-                Manifest.permission.READ_CONTACTS)) {
-           // Toast.makeText(MembersActivity.this,"CONTACTS permission allows us to Access CONTACTS app", Toast.LENGTH_LONG).show();
-
-        } else {
-            ActivityCompat.requestPermissions(MembersActivity.this,new String[]{
-                    Manifest.permission.READ_CONTACTS}, RequestPermissionCode);
-        }
-    }
 
 
 

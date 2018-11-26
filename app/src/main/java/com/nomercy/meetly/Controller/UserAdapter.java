@@ -78,7 +78,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
                         public void onResponse(Call<User> call, Response<User> response) {
                             response.body();
                             int id = response.body().getId();
-                            Toast.makeText(context, "id: " + id , Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(context, "id: " + id , Toast.LENGTH_LONG).show();
                             if(id != 0) {
                                 member.setId(id);
                                 checkedUsers.add(member);

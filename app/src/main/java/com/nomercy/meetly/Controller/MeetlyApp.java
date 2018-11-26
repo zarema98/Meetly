@@ -1,7 +1,9 @@
 package com.nomercy.meetly.Controller;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -54,6 +57,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MeetlyApp extends AppCompatActivity implements AuthorizationFragment.onSomeEventListener,NavigationView.OnNavigationItemSelectedListener{
 
     // Инициализация переменных и объектов:
+    public  static final int RequestPermissionCode  = 1 ;
     FrameLayout frameHead, frameBody;
     RecyclerView feed;
     ConstraintLayout meetsScreen, newMeetBar;
@@ -122,6 +126,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
 
         authorization();
+        enableRuntimePermission();
         addListenerOnButton();
 
         getMeets();
@@ -145,6 +150,33 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
             }
         });
+    }
+
+    @Override
+    @SuppressWarnings({"MissingPermission"})
+    public void onRequestPermissionsResult(int RC, String per[], int[] PResult) {
+        switch (RC) {
+            case RequestPermissionCode:
+                if (PResult.length > 0 && PResult[0] == PackageManager.PERMISSION_GRANTED) {
+                    //      Toast.makeText(MembersActivity.this,"Permission Granted, Now your application can access CONTACTS.", Toast.LENGTH_LONG).show();
+                } else {
+                    //Toast.makeText(MembersActivity.this,"Permission Canceled, Now your application cannot access CONTACTS.", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
+    public void enableRuntimePermission(){
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                MeetlyApp.this,
+                Manifest.permission.READ_CONTACTS)) {
+            // Toast.makeText(MembersActivity.this,"CONTACTS permission allows us to Access CONTACTS app", Toast.LENGTH_LONG).show();
+
+        } else {
+            ActivityCompat.requestPermissions(MeetlyApp.this,new String[]{
+                    Manifest.permission.READ_CONTACTS}, RequestPermissionCode);
+        }
     }
 
     private void enableSwipe(){
