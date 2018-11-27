@@ -13,12 +13,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nomercy.meetly.Model.DBHelper;
 import com.nomercy.meetly.Model.GroupList;
 import com.nomercy.meetly.Model.Groups;
 import com.nomercy.meetly.R;
+import com.nomercy.meetly.RecyclerTouchListener;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
 
@@ -34,7 +36,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GroupsMain extends AppCompatActivity {
-    ImageButton btnAddMembers;
     private List<Groups> groupsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private GroupsAdapter mAdapter;
@@ -43,15 +44,18 @@ public class GroupsMain extends AppCompatActivity {
     Retrofit retrofit;
     String groupName;
     int user_id;
+    int group_id;
+    TextView idOfGroup;
     private SwipeRefreshLayout swipeContainer;
     ArrayList<Groups> curGroups = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_groups);
         mDbHelper = new DBHelper(this);
-        btnAddMembers = findViewById(R.id.buttonAddMembersToGroup);
+
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -65,8 +69,7 @@ public class GroupsMain extends AppCompatActivity {
                 .baseUrl(Constants.BaseUrl)
                 .build();
 
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerGroups);
+        recyclerView = findViewById(R.id.recyclerGroups);
 
 //        mAdapter = new GroupsAdapter(groupsList);
 //        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -86,27 +89,9 @@ public class GroupsMain extends AppCompatActivity {
             }
         });
 
-        btnAddMembers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(GroupsMain.this, GroupMembersActivity.class);
-                startActivity(intent);
-            }
-        });
         fab =  findViewById(R.id.fabBtn);
 
-//        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                Groups groups = groupsList.get(position);
-//                Toast.makeText(getApplicationContext(), groups.getGroupName() + " is selected!", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +132,20 @@ public class GroupsMain extends AppCompatActivity {
                 dialog.show();
             }
         });
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent intent  = new Intent(GroupsMain.this, AboutGroup.class);
+                intent.putExtra("groupName1", mAdapter.getItemName(position));
+                intent.putExtra("idMemberOfGroup1", mAdapter.getItemid(position));
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
     }
 
 
@@ -177,18 +176,18 @@ public class GroupsMain extends AppCompatActivity {
     }
 
     public void generateGroup(ArrayList<Groups> groupDataList) {
-        Groups groups;
-        for(int i=0; i < groupDataList.size(); i++) {
-            groups = new Groups(groupDataList.get(i).getGroupName(), R.drawable.groups);
-            curGroups.add(groups);
-        }
-        recyclerView = findViewById(R.id.recyclerGroups);
-        mAdapter = new GroupsAdapter(curGroups);
+       // Groups groups;
+//        for(int i=0; i < groupDataList.size(); i++) {
+//            groups = new Groups(groupDataList.get(i).getGroup_id(), groupDataList.get(i).getGroupName(), R.drawable.groups);
+//            curGroups.add(groups);
+//        }
+        mAdapter = new GroupsAdapter(groupDataList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+
         swipeContainer.setRefreshing(false);
 
     }

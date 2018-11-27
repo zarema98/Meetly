@@ -107,12 +107,6 @@ public interface APIInterface {
             @Field("meet_id") int meet_id
     );
 
-    @GET("/api/groups/addMembersToGroup")
-    Call<Group>addMembers(
-            @Field("members_array") int []participant,
-            @Field("group_id") int group_id
-    );
-
 
     @GET("/api/meets/checkPhoneNumber/{telephone}")
     Call<User>checkPhoneNumber(
@@ -122,8 +116,13 @@ public interface APIInterface {
     @FormUrlEncoded
     @POST("/api/groups/addMembersToGroup")
     Call<Groups>addMembersToGroup(
-            @Field("members") ArrayList<Integer> members,
+            @Field("members_array") ArrayList<Integer> members_array,
             @Field("group_id") int group_id
+    );
+
+    @GET("/api/groups/membersOfGroup/{id}")
+    Call<User>getMembersOfGroup(
+            @Path("id") int id
     );
 
 }

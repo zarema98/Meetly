@@ -3,6 +3,7 @@ package com.nomercy.meetly.Model;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class User implements Serializable {
 
@@ -30,12 +31,25 @@ public class User implements Serializable {
     @SerializedName("user_id")
     private String user_id;
 
+    @SerializedName("members")
+    public ArrayList<String> members = new ArrayList<>();
+
+    public ArrayList<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(ArrayList<String> members) {
+        this.members = members;
+    }
+
     public boolean isSelected;
 
     public User(String telephone, String name) {
         this.telephone = telephone;
         this.name = name;
     }
+
+
 
     public void setSelected (boolean selected) {
         isSelected = selected;
@@ -104,6 +118,10 @@ public class User implements Serializable {
 
 
     public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
     }
 
     public void setTelephone(String telephone){

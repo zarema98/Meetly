@@ -1,5 +1,7 @@
 package com.nomercy.meetly.Controller;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +17,29 @@ import java.util.List;
 public class GroupsAdapter  extends RecyclerView.Adapter <GroupsAdapter.GroupsViewHolder>{
     private List<Groups> groupsList;
 
+
     public class GroupsViewHolder extends RecyclerView.ViewHolder {
+
         public TextView groupName;
         public ImageView groupImage;
+        public TextView idOfGroup;
 
         public GroupsViewHolder(View view) {
             super(view);
             groupName = (TextView) view.findViewById(R.id.nameGroup);
             groupImage = (ImageView) view.findViewById(R.id.icon_group);
+            idOfGroup = view.findViewById(R.id.groupId);
         }
+
+//        @Override
+//        public void onClick(View view) {
+//            int pos = getAdapterPosition();
+//            Context context = view.getContext();
+//            Intent intent = new Intent(context, AboutGroup.class);
+//            intent.putExtra("groupName", getItemName(pos));
+//            context.startActivity(intent);
+//
+//        }
     }
 
 
@@ -43,8 +59,17 @@ public class GroupsAdapter  extends RecyclerView.Adapter <GroupsAdapter.GroupsVi
     public void onBindViewHolder(GroupsViewHolder holder, int position) {
         Groups groups = groupsList.get(position);
         holder.groupName.setText(groups.getGroupName());
-        holder.groupImage.setImageResource(groups.getgroupImage());
-        //holder.groupImage.setText(groups.getgroupImage());
+        holder.groupImage.setImageResource(R.drawable.groups);
+        holder.idOfGroup.setText(String.valueOf(groups.getGroup_id()));
+
+    }
+
+    public int getItemid (int pos) {
+        return groupsList.get(pos).group_id;
+    }
+
+    public String getItemName(int pos) {
+        return groupsList.get(pos).groupName;
     }
 
 

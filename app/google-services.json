@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "191609250364",
-    "firebase_url": "https://meetlyapp.firebaseio.com",
-    "project_id": "meetlyapp",
-    "storage_bucket": "meetlyapp.appspot.com"
+    "project_number": "996218132438",
+    "firebase_url": "https://meetlypushapp-76648.firebaseio.com",
+    "project_id": "meetlypushapp-76648",
+    "storage_bucket": "meetlypushapp-76648.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:191609250364:android:2bc4631fe867cbdd",
+        "mobilesdk_app_id": "1:996218132438:android:2bc4631fe867cbdd",
         "android_client_info": {
           "package_name": "com.nomercy.meetly"
         }
       },
       "oauth_client": [
         {
-          "client_id": "191609250364-sngvhjoh02f5ld7k3fhn43hnuqk4eff4.apps.googleusercontent.com",
+          "client_id": "996218132438-en0m77bf8u579qmqvrqjkh80g4v4nlni.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDVtEJ8U6baPGXzmoHecUtD2ia6lZYGgG0"
+          "current_key": "AIzaSyDf7zLy3Wo9lZ_dj_U0eYYJA0Rb2mZQmhI"
         }
       ],
       "services": {

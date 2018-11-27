@@ -37,7 +37,6 @@ import java.util.Objects;
 public class MembersActivity extends AppCompatActivity {
     Cursor cursor ;
     String name, phonenumber ;
-
     RecyclerView members;
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
@@ -56,8 +55,8 @@ public class MembersActivity extends AppCompatActivity {
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        getContacts();
 
+        getContacts();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

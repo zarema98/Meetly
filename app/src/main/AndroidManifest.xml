@@ -42,6 +42,10 @@
             android:name=".Controller.ScoreActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".Controller.AboutGroup"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

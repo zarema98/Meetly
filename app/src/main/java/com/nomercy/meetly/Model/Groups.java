@@ -9,7 +9,7 @@ public class Groups {
     public int group_id;
 
     @SerializedName("name")
-    private String groupName;
+    public String groupName;
 
     private int groupImage;
 
@@ -23,8 +23,8 @@ public class Groups {
 
 
 
-    public Groups(String groupName,  int groupImage){
-
+    public Groups(int id, String groupName,  int groupImage){
+        this.group_id = id;
         this.groupName=groupName;
         this.groupImage = groupImage;
 }

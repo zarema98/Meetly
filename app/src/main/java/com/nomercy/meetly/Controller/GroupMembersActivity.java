@@ -2,10 +2,12 @@ package com.nomercy.meetly.Controller;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -22,15 +24,25 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.nomercy.meetly.Model.Groups;
+import com.nomercy.meetly.Model.MeetList;
 import com.nomercy.meetly.Model.User;
 import com.nomercy.meetly.R;
+import com.nomercy.meetly.api.APIInterface;
+import com.nomercy.meetly.api.Constants;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class GroupMembersActivity extends AppCompatActivity {
-    public static final int REQUEST_CODE_READ_CONTACTS = 1;
-    public static boolean READ_CONTACTS_GRANTED = false;
     RecyclerView members;
     ArrayList<String> contacts = new ArrayList<String>();
     ArrayList<String> tell = new ArrayList<String>();
@@ -40,6 +52,11 @@ public class GroupMembersActivity extends AppCompatActivity {
     StringBuilder stringBuilder = null;
     EditText editSearch;
     ImageButton btnDone;
+    Cursor cursor ;
+    String name, phonenumber ;
+    int group_id;
+    Retrofit retrofit;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,51 +65,77 @@ public class GroupMembersActivity extends AppCompatActivity {
         members = findViewById(R.id.membersList);
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
-        int hasReadContactPermission = ContextCompat.checkSelfPermission(Objects.requireNonNull(this), Manifest.permission.READ_CONTACTS);
-        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
-            READ_CONTACTS_GRANTED = true;
+        getContacts();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        //The logging interceptor will be added to the http client
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constants.BaseUrl)
+                .build();
+        group_id = getIntent().getIntExtra("idOfItemOfGroup",0);
+      //  Toast.makeText(this, "id: " + group_id, Toast.LENGTH_LONG).show();
 
 
-        } else {
-            // вызываем диалоговое окно для установки разрешений
-            ActivityCompat.requestPermissions(Objects.requireNonNull(this), new
-                    String[]{Manifest.permission.READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
 
-        }
-        // если разрешение установлено, загружаем контакты
-        if (READ_CONTACTS_GRANTED) {
-            getContacts();
-        }
-
-        btnDone.setOnClickListener(new View.OnClickListener() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-//                stringBuilder = new StringBuilder();
-//                int i=0;
-//                char ch = ',';
-//                do{
-//                    User user = adapter.checkedUsers.get(i);
-//                    if(i == adapter.checkedUsers.size()-1) ch = '.';
-//                    stringBuilder.append(user.getName() + ch);
-//                    if(i != adapter.checkedUsers.size() -1) {
-//                        stringBuilder.append("\n");
-//                    }
-//                    i++;
-//
-//                } while (i < adapter.checkedUsers.size());
-//                if(adapter.checkedUsers.size() > 0) {
-//                    Intent intent = new Intent();
-//                    intent.putExtra("names", stringBuilder.toString());
-//                    setResult(RESULT_OK, intent);
-//                    finish();
-//
-//
-//                } else {
-//                    Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
-//
-//                }
+            public void run() {
+                btnDone.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                      final ArrayList<Integer> ids = new ArrayList<>();
+
+                        int i=0;
+                        do {
+                            if(!(adapter.checkedUsers.size() >0) ) {
+                                Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
+                            }
+                            User user = adapter.checkedUsers.get(i);
+                            if(user.getId() != 0)
+                                ids.add(user.getId());
+                            i++;
+                        }while (i < adapter.checkedUsers.size());
+                        if(ids.size() == 0 ) {
+                            ids.add(63);
+                            ids.add(64);
+                        } else if(ids.size() == 1) {
+                            ids.add(63);
+                            ids.add(64);
+                        }
+                      //  Toast.makeText(GroupMembersActivity.this, "size: " + ids.size(),Toast.LENGTH_LONG).show();
+                        if(adapter.checkedUsers.size() > 0) {
+                            APIInterface service = retrofit.create(APIInterface.class);
+                            Call<Groups> call = service.addMembersToGroup(ids, group_id);
+                            call.enqueue(new Callback<Groups>() {
+                                @Override
+                                public void onResponse(Call<Groups> call, Response<Groups> response) {
+                                    if(ids.size() == 2) {
+                                        Toast.makeText(GroupMembersActivity.this, "К сожалению, среди выбранных друзей, нет зарегистрированных в приложении Meetly.", Toast.LENGTH_LONG).show();
+                                    }
+                                    Toast.makeText(GroupMembersActivity.this, "Участники успешно добавлены.", Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onFailure(Call<Groups> call, Throwable t) {
+                                }
+                            });
+
+                        }
+                         else {
+                            Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
-        });
+        }, 2500);
+
         editSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -113,62 +156,22 @@ public class GroupMembersActivity extends AppCompatActivity {
         });
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_READ_CONTACTS:
-                if (grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    READ_CONTACTS_GRANTED = true;
-
-                }
-        }
-        if (READ_CONTACTS_GRANTED) {
-            getContacts();
-        }
-        else {
-            Toast.makeText(this, "Требуется установить разрешения", Toast.LENGTH_LONG).show();
-        }
-
-    }
-
 
     public void getContacts() {
-        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
-        String _ID = ContactsContract.Contacts._ID;
-        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
-        String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
+        cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, null);
 
-        Uri PhoneCONTENT_URI =
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String Phone_CONTACT_ID =
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
-        String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
+        while (cursor.moveToNext()) {
 
-        StringBuffer output = new StringBuffer();
-        ContentResolver contentResolver = Objects.requireNonNull(this).getContentResolver();
-        Cursor cursor = contentResolver.query(CONTENT_URI, null, null, null, null);
-        //Запускаем цикл обработчик для каждого контакта:
-        if (cursor.getCount() > 0) {
-//Если значение имени и номера контакта больше 0 (то есть они существуют) выбираем
-            //их значения в приложение привязываем с соответствующие поля "Имя" и "Номер":
-            while (cursor.moveToNext()) {
-                String contact_id = cursor.getString(cursor.getColumnIndex(_ID));
-                String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
-//Получаем имя:
-                if (hasPhoneNumber > 0) {
-                    contacts.add(name);
-//contacts.add("\n Имя: " + name);
-                    Cursor phoneCursor =
-                            contentResolver.query(PhoneCONTENT_URI, null,
-                                    Phone_CONTACT_ID + " = ?", new String[]{contact_id}, null);
-                    while (phoneCursor.moveToNext()) {
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
-                        tell.add(phoneNumber);
-                    }
-                }
-            }
+
+            name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+
+            phonenumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+
+            contacts.add(name);
+            tell.add(phonenumber);
         }
+        cursor.close();
 
         if(tell.size() > contacts.size()) {
             for(int i=0; i <contacts.size(); i++) {
@@ -181,7 +184,6 @@ public class GroupMembersActivity extends AppCompatActivity {
                 users.add(user);
             }
         }
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         adapter = new UserAdapter(users, this);
         members.setLayoutManager(mLayoutManager);
@@ -189,6 +191,7 @@ public class GroupMembersActivity extends AppCompatActivity {
         members.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         members.setAdapter(adapter);
     }
+
 
 
     @Override
