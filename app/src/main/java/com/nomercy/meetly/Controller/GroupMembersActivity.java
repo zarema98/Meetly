@@ -93,15 +93,16 @@ public class GroupMembersActivity extends AppCompatActivity {
                       final ArrayList<Integer> ids = new ArrayList<>();
 
                         int i=0;
-                        do {
-                            if(!(adapter.checkedUsers.size() >0) ) {
-                                Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
-                            }
-                            User user = adapter.checkedUsers.get(i);
-                            if(user.getId() != 0)
-                                ids.add(user.getId());
-                            i++;
-                        }while (i < adapter.checkedUsers.size());
+                        try {
+                            do {
+                                User user = adapter.checkedUsers.get(i);
+                                if (user.getId() != 0)
+                                    ids.add(user.getId());
+                                i++;
+                            } while (i < adapter.checkedUsers.size());
+                        } catch (IndexOutOfBoundsException e)  {
+                            Toast.makeText(GroupMembersActivity.this, "Пожалуйста, выберите друзей", Toast.LENGTH_LONG).show();
+                        }
                         if(ids.size() == 0 ) {
                             ids.add(63);
                             ids.add(64);
