@@ -25,6 +25,7 @@ public interface APIInterface {
     Call<User>post(
             @Field("telephone") String method
     );
+
     @FormUrlEncoded
     @POST("/api/auth/registerConfirmSms")
     Call<User>post(
@@ -122,6 +123,40 @@ public interface APIInterface {
 
     @GET("/api/groups/membersOfGroup/{id}")
     Call<User>getMembersOfGroup(
+            @Path("id") int id
+    );
+
+    @FormUrlEncoded
+    @POST("/api/meets/saveToken")
+    Call<User>saveToken(
+            @Field("token") String token,
+            @Field("user_id") int user_id
+    );
+
+    @FormUrlEncoded
+    @POST("/api/meets/sendNotification")
+    Call<User>sendNotification(
+            @Field("user_id") int user_id
+    );
+
+    @GET("/api/auth/myProfile/{id}")
+    Call<User>myProfile(
+            @Path("id") int id
+    );
+
+    @FormUrlEncoded
+    @HTTP(method = "PUT", path = "/api/auth/updateProfile", hasBody = true)
+    Call<User>updateProfile(
+            @Field("user_id") int user_id,
+            @Field("name") String name,
+            @Field("surname") String surname,
+            @Field("telephone") String telephone
+
+
+    );
+
+    @GET("/api/meets/membersOfMeet/{id}")
+    Call<User>getMembersOfMeet(
             @Path("id") int id
     );
 

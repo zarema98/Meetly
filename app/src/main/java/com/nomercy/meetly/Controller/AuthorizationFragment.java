@@ -2,26 +2,41 @@ package com.nomercy.meetly.Controller;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nomercy.meetly.Model.DBHelper;
 import com.nomercy.meetly.R;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
 import com.nomercy.meetly.Model.User;
+
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -36,8 +51,11 @@ import ru.tinkoff.decoro.slots.Slot;
 import ru.tinkoff.decoro.watchers.FormatWatcher;
 import ru.tinkoff.decoro.watchers.MaskFormatWatcher;
 
-public class AuthorizationFragment extends Fragment {
+import static android.app.Activity.RESULT_OK;
 
+public class AuthorizationFragment extends Fragment {
+    private final int IMG_REQUEST = 1;
+    Bitmap bitmap;
     ConstraintLayout logoScreen, authorizationHeadScreen, authorizationScreen, codeInputScreen,
             registrationAccountScreen;
     EditText numberInput; // Переменная содержащая номер пользователя.
@@ -54,6 +72,7 @@ public class AuthorizationFragment extends Fragment {
     ProgressBar authProgressBar, registerProgressBar, createAccountProgressBar;
     private DBHelper mDBHelper;
     String formattedTelephone;
+    ImageView userImage;
 
     String userStatus;
     public boolean numberStatus; // Переменная содержащая статус номера.
@@ -103,6 +122,7 @@ public class AuthorizationFragment extends Fragment {
         codeInput = v.findViewById(R.id.codeInput);
         nameInput = v.findViewById(R.id.nameInput);
         surnameInput = v.findViewById(R.id.surnameInput);
+        userImage = v.findViewById(R.id.userIcon);
 
         checkNumber = v.findViewById(R.id.checkNumber);
         nextEvent = v.findViewById(R.id.nextEvent);
@@ -115,7 +135,8 @@ public class AuthorizationFragment extends Fragment {
         createAccountProgressBar.setVisibility(View.GONE);
 
          mDBHelper = new DBHelper(getContext());
-       //  mDBHelper.deleteUser();
+//         int id = mDBHelper.getId();
+//         mDBHelper.deleteUser(id);
 
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -144,6 +165,12 @@ public class AuthorizationFragment extends Fragment {
 
     // Сканер косаний:
     public void addListenerOnButton() {
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage();
+            }
+        });
         checkNumber.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -167,6 +194,7 @@ public class AuthorizationFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         createAccountLogic();
+                        //registerNewEmail(name, formattedTelephone);
                     }
                 }
         );
@@ -250,6 +278,7 @@ public class AuthorizationFragment extends Fragment {
             }
         });
     }
+
         /*
         // Считывать numberInput ниеже:
 
@@ -276,7 +305,79 @@ public class AuthorizationFragment extends Fragment {
         codeInputScreen.setVisibility(View.VISIBLE); */
     }
 
+    public void registerNewEmail(final String name, final String telephone){
 
+
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(name, telephone)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                      //  Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+
+                        if (task.isSuccessful()){
+                          //  Log.d(TAG, "onComplete: AuthState: " + FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+
+                            //insert some default data
+                            User user = new User();
+                            user.setName(name);
+                            user.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child(getString(R.string.dbnode_users))
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .setValue(user)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            FirebaseAuth.getInstance().signOut();
+
+                                            //redirect the user to the login screen
+                                          //  redirectLoginScreen();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getContext(), "something went wrong.", Toast.LENGTH_SHORT).show();
+                                    FirebaseAuth.getInstance().signOut();
+
+                                    //redirect the user to the login screen
+                                    //redirectLoginScreen();
+                                }
+                            });
+
+                        }
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Unable to Register",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                       // hideDialog();
+
+                        // ...
+                    }
+                });
+    }
+
+    public void selectImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, IMG_REQUEST);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMG_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri path = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), path);
+                userImage.setImageBitmap(bitmap);
+                userImage.setVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
     void checkCodeLogic() {
         APIInterface service = retrofit.create(APIInterface.class);
         registerProgressBar.setVisibility(View.VISIBLE);
@@ -376,6 +477,8 @@ public class AuthorizationFragment extends Fragment {
             public void onResponse(Call<User> call, Response<User> response) {
                 response.body();
                 message = response.body().getMessage();
+             //   int id = mDBHelper.getId();
+              //  mDBHelper.addInfo(name, surname, id);
                 //Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
                 //Toast.makeText(getContext(),message,Toast.LENGTH_LONG).show();
                 Toast.makeText(getContext(), "Регистрация прошла успешно", Toast.LENGTH_LONG).show();
@@ -398,5 +501,8 @@ public class AuthorizationFragment extends Fragment {
 
         someEventListener.someEvent("toMain");*/
     }
+
+
+
 }
 

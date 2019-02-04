@@ -72,6 +72,7 @@ public class AboutGroup extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(AboutGroup.this, GroupMembersActivity.class);
                 intent.putExtra("idOfItemOfGroup", id);
+                intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
                 startActivity(intent);
             }
         });

@@ -57,6 +57,10 @@ public class MeetAdapter extends RecyclerView.Adapter<MeetAdapter.MyViewHolder> 
         return meetList.get(pos).meet_id;
     }
 
+    public String getItemName(int pos) {
+        return  meetList.get(pos).name;
+    }
+
     public void restoreItem(Meet model, int position) {
         meetList.add(position, model);
         // notify item added by position

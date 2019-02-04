@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -27,19 +28,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.design.widget.NavigationView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.nomercy.meetly.Model.DBHelper;
 import com.nomercy.meetly.Model.Meet;
 import com.nomercy.meetly.Model.MeetList;
 import com.nomercy.meetly.R;
+import com.nomercy.meetly.RecyclerTouchListener;
 import com.nomercy.meetly.api.APIInterface;
 import com.nomercy.meetly.api.Constants;
 import com.nomercy.meetly.Model.User;
@@ -80,6 +91,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     ArrayList<Meet> curMeet= new ArrayList<>();
 
 
+
     public static DrawerLayout drawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +99,6 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.feed);
         ll = findViewById(R.id.linearLayout);
-
-
-
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -126,9 +135,22 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 
 
         authorization();
-        enableRuntimePermission();
+     //   enableRuntimePermission();
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TOKEN", "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult().getToken();
+                        sendRegistrationToServer(token);
+                      //  Toast.makeText(MeetlyApp.this, token, Toast.LENGTH_SHORT).show();
+                    }
+                });
         addListenerOnButton();
-
         getMeets();
 //        curMeet = getArrayList("meets");
 //        if(curMeet != null) {
@@ -141,12 +163,45 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
 ////            }
 //        }
 
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent intent  = new Intent(MeetlyApp.this, AboutMeet.class);
+                intent.putExtra("meetName2", mAdapter.getItemName(position));
+                intent.putExtra("idMembersOfMeet2", mAdapter.getItemid(position));
+                intent.setFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
        enableSwipe();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 getMeets();
 
+
+            }
+        });
+    }
+
+    public void sendRegistrationToServer(String token) {
+        APIInterface service = retrofit.create(APIInterface.class);
+        int id = mDBHelper.getId();
+
+        final Call<User> call = service.saveToken(token, id);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                String  message = response.body().getMessage();
+             //   Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
 
             }
         });
@@ -424,6 +479,7 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
                 frameBody.setVisibility(View.GONE);
                 frameHead.setVisibility(View.VISIBLE);
                 meetsScreen.setVisibility(View.VISIBLE);
+                enableRuntimePermission();
 
 
                 HeadFragment headFragment = new HeadFragment();
@@ -502,14 +558,16 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.nav_settings) {
+        if(id == R.id.nav_profile) {
+            Intent intent = new Intent(this, ProfileActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_settings) {
 //            String activeFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container).getClass().getSimpleName();
 //            if(!activeFragment.equals(BookmarkFragment.class.getSimpleName())) {
 //                goToFragment(bookmarkFragment, false);
 //            }
-        }
-
-        if (id == R.id.nav_group) {
+        } else if (id == R.id.nav_group) {
             Intent intent = new Intent(this, GroupsMain.class);
             startActivity(intent);
             // Handle the camera action
@@ -518,6 +576,8 @@ public class MeetlyApp extends AppCompatActivity implements AuthorizationFragmen
             startActivity(intent);
 
         } else if (id == R.id.nav_help) {
+//            Intent intent = new Intent(this, HelpActivity.class);
+//            startActivity(intent);
 
         }  else if (id == R.id.nav_share) {
             Intent myIntent = new Intent(Intent.ACTION_SEND);

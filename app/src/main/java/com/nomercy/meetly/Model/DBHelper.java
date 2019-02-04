@@ -28,6 +28,8 @@ public class DBHelper extends SQLiteOpenHelper {
     private final String COL_TOKEN = "token";
     private final String COL_AUTH = "auth";
     private final String COL_SEEN = "seen";
+    private final String COL_NAME = "name";
+    private final String COL_SURNAME = "surname";
 
     public SQLiteDatabase mDB;
 
@@ -93,6 +95,28 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
+
+
+        public String getUserName (int id) {
+            String q = "SELECT name FROM users WHERE upper([id]) = "+id+" ";
+            Cursor result = mDB.rawQuery(q, null);
+           String name = "";
+            while(result.moveToNext()) {
+                name = result.getString(result.getColumnIndex(COL_ID));
+            }
+            return name;
+        }
+
+    public String getUserSurname (int id) {
+        String q = "SELECT surname FROM users WHERE upper([id]) = "+id+" ";
+        Cursor result = mDB.rawQuery(q, null);
+        String surname = "";
+        while(result.moveToNext()) {
+            surname = result.getString(result.getColumnIndex(COL_ID));
+        }
+        return surname;
+    }
+
         public void deleteUser(int id) {
             try {
                 String q = "DELETE FROM users WHERE upper([id]) = upper(?)";
@@ -101,6 +125,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
             }
         }
+
+    public void addInfo (String name, String surname, int id) {
+        try {
+            String q = "UPDATE  users SET "+COL_NAME+" = (?), "+COL_SURNAME+" = (?) WHERE id = (?)";
+            mDB.execSQL(q, new Object[]{name, surname, id});
+        } catch (SQLException ex) {
+
+        }
+    }
 
         public void updateSeen (int id) {
             try {

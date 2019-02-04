@@ -1,6 +1,7 @@
 package com.nomercy.meetly.Controller;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -39,6 +40,7 @@ public class GroupsMain extends AppCompatActivity {
     private List<Groups> groupsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private GroupsAdapter mAdapter;
+    private ImageButton back;
     FloatingActionButton fab;
     DBHelper mDbHelper;
     Retrofit retrofit;
@@ -55,6 +57,7 @@ public class GroupsMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_groups);
         mDbHelper = new DBHelper(this);
+        back = findViewById(R.id.toBack);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -91,7 +94,13 @@ public class GroupsMain extends AppCompatActivity {
 
         fab =  findViewById(R.id.fabBtn);
 
-
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GroupsMain.this, MeetlyApp.class);
+                startActivity(intent);
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

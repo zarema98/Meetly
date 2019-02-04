@@ -17,7 +17,7 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="49dp"
             android:src="@drawable/gradient"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

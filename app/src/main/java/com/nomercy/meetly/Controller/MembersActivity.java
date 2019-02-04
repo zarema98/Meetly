@@ -1,16 +1,8 @@
 package com.nomercy.meetly.Controller;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
@@ -23,16 +15,26 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.nomercy.meetly.Model.User;
 import com.nomercy.meetly.R;
+import com.nomercy.meetly.api.APIInterface;
+import com.nomercy.meetly.api.Constants;
 
 import java.util.ArrayList;
-import java.util.Objects;
+
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MembersActivity extends AppCompatActivity {
     Cursor cursor ;
@@ -46,7 +48,9 @@ public class MembersActivity extends AppCompatActivity {
     ImageButton btnDone;
     StringBuilder stringBuilder = null;
     EditText editSearch;
+    Retrofit retrofit;
     @Override
+
     protected void onCreate(@Nullable Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_members);
@@ -54,6 +58,19 @@ public class MembersActivity extends AppCompatActivity {
         members = findViewById(R.id.membersList);
         btnDone = findViewById(R.id.btnDone);
         editSearch = findViewById(R.id.edit_search);
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        //The logging interceptor will be added to the http client
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        retrofit = new Retrofit.Builder()
+                .client(httpClient.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(Constants.BaseUrl)
+                .build();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         getContacts();
@@ -94,6 +111,8 @@ public class MembersActivity extends AppCompatActivity {
 //                        Toast.makeText(MembersActivity.this, "size: " + ids.size(), Toast.LENGTH_LONG).show();
 //                    }
                             intent.putExtra("ids", ids);
+                         //   final APIInterface service = retrofit.create(APIInterface.class);
+
 
                             setResult(RESULT_OK, intent);
                             finish();
@@ -131,13 +150,7 @@ public class MembersActivity extends AppCompatActivity {
 
     }
 
-
-
-
-
-
-
-    public void getContacts() {
+       public void getContacts() {
         cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null, null, null);
 
         while (cursor.moveToNext()) {

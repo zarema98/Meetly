@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -182,6 +183,7 @@ public class NewMeetingFragment extends Fragment  {
         btnMembers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Intent intent = new Intent(getContext(), MembersActivity.class);
                 Intent intent = new Intent(getContext(), MembersActivity.class);
                 startActivityForResult(intent, 2);
             }
@@ -194,7 +196,7 @@ public class NewMeetingFragment extends Fragment  {
             @Override
             public void onClick(View view) {
                 createMeet();
-            }
+                }
         });
     }
 
@@ -239,7 +241,7 @@ public class NewMeetingFragment extends Fragment  {
 
 
     public void createMeet() {
-       APIInterface service = retrofit.create(APIInterface.class);
+     final  APIInterface service = retrofit.create(APIInterface.class);
        nameS = name.getText().toString();
        date = dateInput.getText().toString();
        time = timeInput.getText().toString();
@@ -279,20 +281,38 @@ public class NewMeetingFragment extends Fragment  {
        call.enqueue(new Callback<User>() {
            @Override
            public void onResponse(Call<User> call, Response<User> response) {
-               response.body();
-             //  message = response.body().getMessage();
-           //    Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
+               for (int i = 0; i < ids.size(); i++) {
+                   if (ids.get(i) != 63 || ids.get(i) != 64) {
+                       Call<User> call2 = service.sendNotification(ids.get(i));
+                   call2.enqueue(new Callback<User>() {
+                       @Override
+                       public void onResponse(Call<User> call, Response<User> response) {
+                       }
+
+                       @Override
+                       public void onFailure(Call<User> call, Throwable t) {
+                       }
+                   });
+               }
+           }
+
                someEventListener.someEvent("backToMain");
                Toast.makeText(getContext(), "Встреча успешно создана. Обновите страницу", Toast.LENGTH_LONG).show();
+
+
            }
 
            @Override
            public void onFailure(Call<User> call, Throwable t) {
            }
        });
+
+
+
+
+
    }
 
 
     }
-
-}
+ }

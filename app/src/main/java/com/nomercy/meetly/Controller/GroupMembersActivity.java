@@ -109,6 +109,8 @@ public class GroupMembersActivity extends AppCompatActivity {
                         } else if(ids.size() == 1) {
                             ids.add(63);
                             ids.add(64);
+                        } else if(ids.size() == 2) {
+                            ids.add(63);
                         }
                       //  Toast.makeText(GroupMembersActivity.this, "size: " + ids.size(),Toast.LENGTH_LONG).show();
                         if(adapter.checkedUsers.size() > 0) {
@@ -119,8 +121,10 @@ public class GroupMembersActivity extends AppCompatActivity {
                                 public void onResponse(Call<Groups> call, Response<Groups> response) {
                                     if(ids.size() == 2) {
                                         Toast.makeText(GroupMembersActivity.this, "К сожалению, среди выбранных друзей, нет зарегистрированных в приложении Meetly.", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(GroupMembersActivity.this, "Участники успешно добавлены.", Toast.LENGTH_LONG).show();
+                                        onBackPressed();
                                     }
-                                    Toast.makeText(GroupMembersActivity.this, "Участники успешно добавлены.", Toast.LENGTH_LONG).show();
                                 }
 
                                 @Override
